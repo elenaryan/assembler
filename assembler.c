@@ -46,26 +46,47 @@ int main(int argc, char **argv)
                         char str[128];
                         sprintf(str, "%d", mark);
                         sm_put(sm, token, str);
-                     }//inner absurd statement
-                    
+                     }//inner absurd statement                    
                     markold = mark; //so mark and markold only diverge for first token in a line
                 }
                 token = strtok(NULL, " \t");
             }
-            /* This will probably be the first step through of the program where labels are located and stored*/
             mark++;
         }//while 
+        fseek(f, 0, SEEK_SET);
+
+        char parse[2048];//be sure to change these numbers to max handlers of the assembler
+        
+
+        
+        //HERE the file is open, but outside of the first pass
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         fclose(f);
     } else {
         printf("Only Enter one input file.\n");
     }
 
 
-    result = sm_get(sm, "hur", buf, sizeof(buf));
-    if (result == 0) {
-        /* Handle value not found... */
-    }
-    printf("value: %s\n", buf);
+
+
+
+
+
 
 
     sm_delete(sm);
