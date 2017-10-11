@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "strmap.h"
+#include "strmap.c"
 
 /* 
  * Elena Ryan and Jenna Olson
@@ -13,6 +15,12 @@
 
 int main(int argc, char **argv)
 {
+
+    StrMap *sm;
+    char buf[255];
+    sm = sm_new(10);
+    int result;
+
     if(argc == 1) {
         printf("No input given.\n");
     } else if (argc == 2) {
@@ -35,6 +43,9 @@ int main(int argc, char **argv)
                     //check if first token is a label
                     if(strcmp(token, "beq") != 0 && strcmp(token, "add") != 0 && strcmp(token, "nand") && strcmp(token, "lw")!= 0 && strcmp(token, "sw") != 0 && strcmp(token, "jalr")!=0 && strcmp(token, "halt") != 0 && strcmp(token, "noop")!= 0 && strcmp(token, ".fill") != 0) {
                         printf("label is %s*** at line %d\n", token, mark);
+                        char str[128];
+                        sprintf(str, "%d", mark);
+                        sm_put(sm, token, str);
                      }//inner absurd statement
                     
                     markold = mark; //so mark and markold only diverge for first token in a line
@@ -50,6 +61,14 @@ int main(int argc, char **argv)
     }
 
 
+    result = sm_get(sm, "hur", buf, sizeof(buf));
+    if (result == 0) {
+        /* Handle value not found... */
+    }
+    printf("value: %s\n", buf);
+
+
+    sm_delete(sm);
     return 0;
 
 
