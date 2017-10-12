@@ -65,9 +65,16 @@ int main(int argc, char **argv)
                 if(mark != markold) {
                     //check if first token is a label
                     if(strcmp(token, "beq") != 0 && strcmp(token, "add") != 0 && strcmp(token, "nand") && strcmp(token, "lw")!= 0 && strcmp(token, "sw") != 0 && strcmp(token, "jalr")!=0 && strcmp(token, "halt") != 0 && strcmp(token, "noop")!= 0 && strcmp(token, ".fill") != 0) {
-                        if(checker0 == token || checker1 == token || checker2 == token || checker3 == token || checker4 == token || checker5 == token || checker6 == token || checker7 == token || checker8 == token || checker9 == token|| checkerspecialchar1 == token || checkerspecialchar2 == token || checkerspecialchar3 == token || checkerspecialchar4 == token || checkerspecialchar5 == token || checkerspecialchar6 == token || checkerspecialchar7 == token || checkerspecialchar8 == token || checkerspecialchar9 == token || checkerspecialchar10 == token || checkerspecialchar11 == token)
+                        // Checks for invalid labels
+			if(checker0 == token || checker1 == token || checker2 == token || checker3 == token || checker4 == token || checker5 == token || checker6 == token || checker7 == token || checker8 == token || checker9 == token|| checkerspecialchar1 == token || checkerspecialchar2 == token || checkerspecialchar3 == token || checkerspecialchar4 == token || checkerspecialchar5 == token || checkerspecialchar6 == token || checkerspecialchar7 == token || checkerspecialchar8 == token || checkerspecialchar9 == token || checkerspecialchar10 == token || checkerspecialchar11 == token)
 			{
 				fprintf(stderr, "Label cannot begin with a number, or contain symbols.\n");
+				return 0;
+			}
+			// Checks for duplicates
+			if(sm_exists(sm, token) == 1)
+			{
+				fprintf(stderr, "Duplicate labels cannot be entered.\n");
 				return 0;
 			}
 			printf("label is %s*** at line %d\n", token, mark);
