@@ -95,7 +95,7 @@ int main(int argc, char **argv)
         int m = 0;//counts lines
         int inst;
         while(fgets(parse, 2048, f) != NULL) {
-            char* tok = strtok(parse, " \t");
+            char* tok = strtok(parse, " \t\n");
             printf("in second pass %s\n", tok);
             if(sm_exists(sm, tok)!=0 || tok == NULL){
                 tok = strtok(NULL, " \t\n");
@@ -104,18 +104,24 @@ int main(int argc, char **argv)
             //printf("HERE WITH toke %s\n", tok);
             
             if(strcmp(tok, "add")==0) {
-                inst = 0 << 24;
+                inst = 0 << 22;
                 tok = strtok(NULL, " \t\n");
                 inst = atoi(tok) | inst;//just throw an e
                 tok = strtok(NULL, " \t\n");
-                inst = atoi(tok)<<18 | inst;//just throw an e
+                inst = atoi(tok)<<19 | inst;//just throw an e
                 tok = strtok(NULL, " \t\n");
-                inst = atoi(tok)<<15 | inst;//just throw an e
+                inst = atoi(tok)<<16 | inst;//just throw an e
                 printf("line is %d and inst is %d\n", m, inst);
             }
 
             if(strcmp(tok, "nand")==0) {
-                inst = 1 << 21;
+                inst = 1 << 22;
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok) | inst;//just throw an e
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok)<<19 | inst;//just throw an e
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok)<<16 | inst;//just throw an e
                 printf("line is %d and inst is %d\n", m, inst);
             }
 
@@ -135,6 +141,14 @@ int main(int argc, char **argv)
 
             if(strcmp(tok, "sw")==0) {
                 inst = 3 << 21;
+                tok = strtok(NULL, " \t\n");
+                inst = (atoi(tok) <<19) | inst;//just throw an e
+                //printf("int is%d\n",inst);
+                tok = strtok(NULL, " \t\n");
+                inst = (atoi(tok)<<16) | inst;//just throw an e
+                //works exceps for labels
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok) | inst;//just throw an e
                 printf("line is %d and inst is %d\n", m, inst);
             }
 
