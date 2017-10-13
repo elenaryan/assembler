@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 
         while(fgets(write, 2048, f) != NULL) {
             // Checking if label is invalid
-	    char* token = strtok(write," \t");
+	    char* token = strtok(write," \t\n");
 	    char *checker0 = strstr(token, "0");
 	    char *checker1 = strstr(token, "1");
             char *checker2 = strstr(token, "2");
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
                      }//inner absurd statement                    
                     markold = mark; //so mark and markold only diverge for first token in a line
                 }
-                token = strtok(NULL, " \t");
+                token = strtok(NULL, " \t\n");
             }
             mark++;
         }//while 
@@ -92,26 +92,87 @@ int main(int argc, char **argv)
 
         char parse[2048];//be sure to change these numbers to max handlers of the assembler
         
+        int m = 0;//counts lines
+        int inst;
+        while(fgets(parse, 2048, f) != NULL) {
+            char* tok = strtok(parse, " \t");
+            printf("in second pass %s\n", tok);
+            if(sm_exists(sm, tok)!=0 || tok == NULL){
+                tok = strtok(NULL, " \t\n");
+            }// if first tok is a label, move on
 
-        
-        //HERE the file is open, but outside of the first pass
+            //printf("HERE WITH toke %s\n", tok);
+            
+            if(strcmp(tok, "add")==0) {
+                inst = 0 << 24;
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok) | inst;//just throw an e
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok)<<18 | inst;//just throw an e
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok)<<15 | inst;//just throw an e
+                printf("line is %d and inst is %d\n", m, inst);
+            }
 
-        
+            if(strcmp(tok, "nand")==0) {
+                inst = 1 << 21;
+                printf("line is %d and inst is %d\n", m, inst);
+            }
 
+            if(strcmp(tok, "lw")==0) {
+                inst = 2 << 22;
+                //printf("stream
+                tok = strtok(NULL, " \t\n");
+                inst = (atoi(tok) <<19) | inst;//just throw an e
+                //printf("int is%d\n",inst);
+                tok = strtok(NULL, " \t\n");
+                inst = (atoi(tok)<<16) | inst;//just throw an e
+                //works exceps for labels
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok) | inst;//just throw an e
+                printf("line is %d and inst is %d\n", m, inst);
+            }
 
+            if(strcmp(tok, "sw")==0) {
+                inst = 3 << 21;
+                printf("line is %d and inst is %d\n", m, inst);
+            }
 
+            if(strcmp(tok, "beq")==0) {
+                inst = 4 << 21;
+                printf("line is %d and inst is %d\n", m, inst);
+            }
+            
+            if(strcmp(tok, "jalr")==0) {
+                inst = 5 << 21;
+                printf("line is %d and inst is %d\n", m, inst);
+            } 
 
+            if(strcmp(tok, "halt")==0) {
+                inst = 6 << 21;
+                printf("line is %d and inst is %d\n", m, inst);
+            }
 
+            if(strcmp(tok, "noop")==0) {
+                inst = 7 << 21;
+                printf("line is %d and inst is %d\n", m, inst);
+            }
+            if(strcmp(tok, ".fill")==0) {
+                int i = 0;
+             }
+                    
+           
+            while(tok) {
+                //printf("%s ", tok);
+                tok = strtok(NULL," \t\n");
+                //tm++;
+            }
+            m++;
 
-
-
-
-
-
-
-
-
+        }
         fclose(f);
+    //} 
+
     } else {
         printf("Only Enter one input file.\n");
     }
