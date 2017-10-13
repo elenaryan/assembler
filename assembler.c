@@ -140,7 +140,7 @@ int main(int argc, char **argv)
             }
 
             if(strcmp(tok, "sw")==0) {
-                inst = 3 << 21;
+                inst = 3 << 22;
                 tok = strtok(NULL, " \t\n");
                 inst = (atoi(tok) <<19) | inst;//just throw an e
                 //printf("int is%d\n",inst);
@@ -153,26 +153,41 @@ int main(int argc, char **argv)
             }
 
             if(strcmp(tok, "beq")==0) {
-                inst = 4 << 21;
+                inst = 4 << 22;
+                tok = strtok(NULL, " \t\n");
+                inst = (atoi(tok) <<19) | inst;//just throw an e
+                //printf("int is%d\n",inst);
+                tok = strtok(NULL, " \t\n");
+                inst = (atoi(tok)<<16) | inst;//just throw an e
+                //works exceps for labels
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok) | inst;//just throw an e
+                //printf("line is %d and inst is %d\n", m, inst);
                 printf("line is %d and inst is %d\n", m, inst);
             }
             
             if(strcmp(tok, "jalr")==0) {
-                inst = 5 << 21;
+                inst = 5 << 22;
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok)<<19 | inst;//just throw an e
+                tok = strtok(NULL, " \t\n");
+                inst = atoi(tok)<<16 | inst;//just throw an e
+                //printf("line is %d and inst is %d\n", m, inst);
                 printf("line is %d and inst is %d\n", m, inst);
             } 
 
             if(strcmp(tok, "halt")==0) {
-                inst = 6 << 21;
+                inst = 6 << 22;
                 printf("line is %d and inst is %d\n", m, inst);
             }
 
             if(strcmp(tok, "noop")==0) {
-                inst = 7 << 21;
+                inst = 7 << 22;
                 printf("line is %d and inst is %d\n", m, inst);
             }
             if(strcmp(tok, ".fill")==0) {
-                int i = 0;
+                inst = atoi(tok);//just throw an e
+                printf("line is %d and inst is %d\n", m, inst);
              }
                     
            
