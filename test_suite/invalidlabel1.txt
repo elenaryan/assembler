@@ -1,4 +1,4 @@
 	lw	1	0	five
 hi	lw	2	1	3
 hi4	add	1	2	1
-@hi	add	3	1	2
+6hi	add	3	1	2
