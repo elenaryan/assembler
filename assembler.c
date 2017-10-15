@@ -31,7 +31,7 @@ int main(int argc, char **argv)
             printf("Invalid file or path.\n");
             exit(0);
         }
-     
+
         char write[2048]; //char array line by line
         int mark = 0;
         int markold = 1;//to denote first line char
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
   	    char *checkerspecialchar8 = strstr(token, "*");
   	    char *checkerspecialchar9 = strstr(token, "?");
   	    char *checkerspecialchar10 = strstr(token, "<");
-  	    char *checkerspecialchar11 = strstr(token, ">");	    
+  	    char *checkerspecialchar11 = strstr(token, ">");
 
 	    while (token) {
                 if(mark != markold) {
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Duplicate labels cannot be entered.\n");
 				return 0;
 			}
-			// Checks for invalid opcodes
+			// Checks for invalid opcodes -- not sure why this breaks your test2.txt
 			/*char* token2 = strtok(NULL, " \t");
 			if(strcmp(token2, "beq") != 0 && strcmp(token2, "add") != 0 && strcmp(token2, "nand") != 0 && strcmp(token2, "lw") != 0 && strcmp(token2, "sw") != 0 && strcmp(token2, "jalr") != 0 && strcmp(token2, "halt") != 0 && strcmp(token2, "noop") != 0 && strcmp(token2, ".fill") != 0)
 			{
@@ -88,17 +88,17 @@ int main(int argc, char **argv)
                         char str[128];
                         sprintf(str, "%d", mark);
                         sm_put(sm, token, str);
-                     }//inner absurd statement                    
+                     }//inner absurd statement
                     markold = mark; //so mark and markold only diverge for first token in a line
                 }
                 token = strtok(NULL, " \t\n");
             }
             mark++;
-        }//while 
+        }//while
         fseek(f, 0, SEEK_SET);
 
         char parse[2048];//be sure to change these numbers to max handlers of the assembler
-        
+
         int m = 0;//counts lines
         int inst;
         while(fgets(parse, 2048, f) != NULL) {
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
             }// if first tok is a label, move on
 
             //printf("HERE WITH toke %s\n", tok);
-            
+
             if(strcmp(tok, "add")==0) {
                 inst = 0 << 22;
                 tok = strtok(NULL, " \t\n");
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
                 //printf("line is %d and inst is %d\n", m, inst);
                 printf("line is %d and inst is %d\n", m, inst);
             }
-            
+
             if(strcmp(tok, "jalr")==0) {
                 inst = 5 << 22;
                 tok = strtok(NULL, " \t\n");
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
                 inst = atoi(tok)<<16 | inst;//just throw an e
                 //printf("line is %d and inst is %d\n", m, inst);
                 printf("line is %d and inst is %d\n", m, inst);
-            } 
+            }
 
             if(strcmp(tok, "halt")==0) {
                 inst = 6 << 22;
@@ -196,8 +196,8 @@ int main(int argc, char **argv)
                 inst = atoi(tok);//just throw an e
                 printf("line is %d and inst is %d\n", m, inst);
              }
-                    
-           
+
+
             while(tok) {
                 //printf("%s ", tok);
                 tok = strtok(NULL," \t\n");
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 
         }
         fclose(f);
-    //} 
+    //}
 
     } else {
         printf("Only Enter one input file.\n");
