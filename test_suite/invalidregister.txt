@@ -1,5 +1,5 @@
 	lw	0	0	five	load reg1 with 5 (symbolic address)
-	lw      2       1       3	load reg2 with -1 (numeric address)
+	lw      9	1       3	*SHOULD ERROR HERE
 start	add	1	2	1	decrement reg1
 	beq	0	1	2	goto end of program when reg1==0
 	add	hi	0	0	*SHOULD ERROR HERE
