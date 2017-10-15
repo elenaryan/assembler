@@ -193,6 +193,7 @@ int main(int argc, char **argv)
                 printf("line is %d and inst is %d\n", m, inst);
             }
             if(strcmp(tok, ".fill")==0) {
+		tok = strtok(NULL," \t\n");
                 inst = atoi(tok);//just throw an e
                 printf("line is %d and inst is %d\n", m, inst);
              }
