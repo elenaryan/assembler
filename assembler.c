@@ -49,6 +49,7 @@ int main(int argc, char **argv)
 	    char *checker7 = strstr(token, "7");
 	    char *checker8 = strstr(token, "8");
 	    char *checker9 = strstr(token, "9");
+	    const char *special_characters = "`~@#$%^&*()+=<>,.?/\{}[]|";
 	    while (token) {
                 if(mark != markold) {
                     //check if first token is a label
@@ -60,7 +61,7 @@ int main(int argc, char **argv)
 				return 0;
 			}
 			// Checking for invalid labels -- Containing special symbols
-			if(strstr(token, "!") != NULL || strstr(token, "@") != NULL || strstr(token, "#") != NULL || strstr(token, "$") != NULL || strstr(token, "%") != NULL || strstr(token, "^") != NULL || strstr(token, "&") != NULL || strstr(token, "*") != NULL || strstr(token, "(") != NULL || strstr(token, ")") != NULL || strstr(token, "<") != NULL || strstr(token, ">") != NULL || strstr(token, "?") != NULL || strstr(token, "+") != NULL || strstr(token, "/") != NULL)
+			if(strpbrk(token, special_characters) != 0)
 			{
 				fprintf(stderr, "Label cannot contain special symbols.\n");
 				return 0;
@@ -111,12 +112,15 @@ int main(int argc, char **argv)
             //printf("HERE WITH toke %s\n", tok);
 
             if(strcmp(tok, "add")==0) {
-                inst = 0 << 22;
+		inst = 0 << 22;
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = atoi(tok) | inst;//just throw an e
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = atoi(tok)<<19 | inst;//just throw an e
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = atoi(tok)<<16 | inst;//just throw an e
                 printf("line is %d and inst is %d\n", m, inst);
             }
@@ -124,10 +128,13 @@ int main(int argc, char **argv)
             if(strcmp(tok, "nand")==0) {
                 inst = 1 << 22;
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = atoi(tok) | inst;//just throw an e
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = atoi(tok)<<19 | inst;//just throw an e
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = atoi(tok)<<16 | inst;//just throw an e
                 printf("line is %d and inst is %d\n", m, inst);
             }
@@ -136,9 +143,11 @@ int main(int argc, char **argv)
                 inst = 2 << 22;
                 //printf("stream
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = (atoi(tok) <<19) | inst;//just throw an e
                 //printf("int is%d\n",inst);
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = (atoi(tok)<<16) | inst;//just throw an e
                 //works exceps for labels
                 tok = strtok(NULL, " \t\n");
@@ -149,9 +158,11 @@ int main(int argc, char **argv)
             if(strcmp(tok, "sw")==0) {
                 inst = 3 << 22;
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = (atoi(tok) <<19) | inst;//just throw an e
                 //printf("int is%d\n",inst);
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = (atoi(tok)<<16) | inst;//just throw an e
                 //works exceps for labels
                 tok = strtok(NULL, " \t\n");
@@ -162,9 +173,11 @@ int main(int argc, char **argv)
             if(strcmp(tok, "beq")==0) {
                 inst = 4 << 22;
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = (atoi(tok) <<19) | inst;//just throw an e
                 //printf("int is%d\n",inst);
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = (atoi(tok)<<16) | inst;//just throw an e
                 //works exceps for labels
                 tok = strtok(NULL, " \t\n");
@@ -176,8 +189,10 @@ int main(int argc, char **argv)
             if(strcmp(tok, "jalr")==0) {
                 inst = 5 << 22;
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = atoi(tok)<<19 | inst;//just throw an e
                 tok = strtok(NULL, " \t\n");
+		if(CheckRegisters(tok) == 0) {return 0;}
                 inst = atoi(tok)<<16 | inst;//just throw an e
                 //printf("line is %d and inst is %d\n", m, inst);
                 printf("line is %d and inst is %d\n", m, inst);
@@ -229,3 +244,14 @@ int main(int argc, char **argv)
 
 }//main
 
+// Function checks if Reg A and Reg B are numbers
+int CheckRegisters(char* tok)
+{
+	const char *letters = "qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM";
+	if(strpbrk(tok, letters) != 0)
+	{
+		fprintf(stderr, "Reg A and Reg B must be numbers\n");
+		return 0;
+	}
+	return 1;
+}
