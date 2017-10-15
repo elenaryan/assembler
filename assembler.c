@@ -4,7 +4,7 @@
 #include "strmap.h"
 #include "strmap.c"
 
-/* 
+/*
  * Elena Ryan and Jenna Olson
  * Computer Architecture
  * Assembler
@@ -32,11 +32,11 @@ int main(int argc, char **argv)
             exit(0);
         }
 
-        char write[2048]; //char array line by line
+        char write[4096]; //char array line by line
         int mark = 0;
         int markold = 1;//to denote first line char
 
-        while(fgets(write, 2048, f) != NULL) {
+        while(fgets(write, 4096, f) != NULL) {
             // Checking if label is invalid
 	    char* token = strtok(write," \t\n");
 	    char *checker0 = strstr(token, "0");
@@ -79,7 +79,8 @@ int main(int argc, char **argv)
 				return 0;
 			}
 			// Checks for invalid opcodes -- not sure why this breaks your test2.txt
-			/*char* token2 = strtok(NULL, " \t");
+			/*char* token2 = strtok(write, " \t\n");
+			token2 = strtok(NULL, " \t");
 			if(strcmp(token2, "beq") != 0 && strcmp(token2, "add") != 0 && strcmp(token2, "nand") != 0 && strcmp(token2, "lw") != 0 && strcmp(token2, "sw") != 0 && strcmp(token2, "jalr") != 0 && strcmp(token2, "halt") != 0 && strcmp(token2, "noop") != 0 && strcmp(token2, ".fill") != 0)
 			{
 				fprintf(stderr, "Opcode invalid.\n");
@@ -98,11 +99,11 @@ int main(int argc, char **argv)
         }//while
         fseek(f, 0, SEEK_SET);
 
-        char parse[2048];//be sure to change these numbers to max handlers of the assembler
+        char parse[4096];//be sure to change these numbers to max handlers of the assembler
 
         int m = 0;//counts lines
         int inst;
-        while(fgets(parse, 2048, f) != NULL) {
+        while(fgets(parse, 4096, f) != NULL) {
             char* tok = strtok(parse, " \t\n");
             printf("in second pass %s\n", tok);
             if(sm_exists(sm, tok)!=0 || tok == NULL){
@@ -223,34 +224,24 @@ int main(int argc, char **argv)
 
         }
         fclose(f);
-    //}
 
     } else {
-        printf("Only Enter one input file.\n");
+        printf("Only enter one input file.\n");
     }
-
-
-
-
-
-
-
-
 
     sm_delete(sm);
     return 0;
-
-
 
 }//main
 
 // Function checks if Reg A and Reg B are numbers
 int CheckRegisters(char* tok)
 {
-	const char *letters = "qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM";
-	if(strpbrk(tok, letters) != 0)
+	const char *badchars = "qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM~!@#$%^&*()_+=?<>{}[]|/";
+	int tok_num = atoi(tok);
+	if(strpbrk(tok, badchars) != 0 || tok_num < 8)
 	{
-		fprintf(stderr, "Reg A and Reg B must be numbers\n");
+		fprintf(stderr, "Reg A and Reg B must be valid registers.\n");
 		return 0;
 	}
 	return 1;
