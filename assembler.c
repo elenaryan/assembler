@@ -77,6 +77,13 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Duplicate labels cannot be entered.\n");
 				return 0;
 			}
+			// Checks for invalid opcodes
+			/*char* token2 = strtok(NULL, " \t");
+			if(strcmp(token2, "beq") != 0 && strcmp(token2, "add") != 0 && strcmp(token2, "nand") != 0 && strcmp(token2, "lw") != 0 && strcmp(token2, "sw") != 0 && strcmp(token2, "jalr") != 0 && strcmp(token2, "halt") != 0 && strcmp(token2, "noop") != 0 && strcmp(token2, ".fill") != 0)
+			{
+				fprintf(stderr, "Opcode invalid.\n");
+				return 0;
+			}*/
 			printf("label is %s*** at line %d\n", token, mark);
                         char str[128];
                         sprintf(str, "%d", mark);
