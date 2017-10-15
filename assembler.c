@@ -8,10 +8,8 @@
  * Elena Ryan and Jenna Olson
  * Computer Architecture
  * Assembler
- * Project Part I | 10/13/2017
+ * Project Part I | 10/15/2017
 */
-
-
 
 int main(int argc, char **argv)
 {
@@ -32,11 +30,11 @@ int main(int argc, char **argv)
             exit(0);
         }
 
-        char write[4096]; //char array line by line
+        char write[2048]; //char array line by line
         int mark = 0;
         int markold = 1;//to denote first line char
 
-        while(fgets(write, 4096, f) != NULL) {
+        while(fgets(write, 2048, f) != NULL) {
             // Checking if label is invalid
 	    char* token = strtok(write," \t\n");
 	    char *checker0 = strstr(token, "0");
@@ -49,10 +47,10 @@ int main(int argc, char **argv)
 	    char *checker7 = strstr(token, "7");
 	    char *checker8 = strstr(token, "8");
 	    char *checker9 = strstr(token, "9");
-	    const char *special_characters = "`~@#$%^&*()+=<>,.?/\{}[]|";
+	    const char *special_characters = "`~@#$%^&*()+=<>,.?/{}[]|";
 	    while (token) {
                 if(mark != markold) {
-                    //check if first token is a label
+                    //Check if first token is a label
                     if(strcmp(token, "beq") != 0 && strcmp(token, "add") != 0 && strcmp(token, "nand") && strcmp(token, "lw")!= 0 && strcmp(token, "sw") != 0 && strcmp(token, "jalr")!=0 && strcmp(token, "halt") != 0 && strcmp(token, "noop")!= 0 && strcmp(token, ".fill") != 0) {
                         // Checking for invalid labels -- Beginning with a number
 			if(checker0 == token || checker1 == token || checker2 == token || checker3 == token || checker4 == token || checker5 == token || checker6 == token || checker7 == token || checker8 == token || checker9 == token)
@@ -78,7 +76,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Label cannot be more than 6 characters.\n");
 				return 0;
 			}
-			// Checks for invalid opcodes -- not sure why this breaks your test2.txt
+			// Checks for invalid opcodes -- not sure why this breaks test2.txt
 			/*char* token2 = strtok(write, " \t\n");
 			token2 = strtok(NULL, " \t");
 			if(strcmp(token2, "beq") != 0 && strcmp(token2, "add") != 0 && strcmp(token2, "nand") != 0 && strcmp(token2, "lw") != 0 && strcmp(token2, "sw") != 0 && strcmp(token2, "jalr") != 0 && strcmp(token2, "halt") != 0 && strcmp(token2, "noop") != 0 && strcmp(token2, ".fill") != 0)
@@ -99,11 +97,11 @@ int main(int argc, char **argv)
         }//while
         fseek(f, 0, SEEK_SET);
 
-        char parse[4096];//be sure to change these numbers to max handlers of the assembler
+        char parse[2048];
 
         int m = 0;//counts lines
         int inst;
-        while(fgets(parse, 4096, f) != NULL) {
+        while(fgets(parse, 2048, f) != NULL) {
             char* tok = strtok(parse, " \t\n");
             printf("in second pass %s\n", tok);
             if(sm_exists(sm, tok)!=0 || tok == NULL){
