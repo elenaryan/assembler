@@ -19,11 +19,11 @@ The hashmap used in this implementation is a string hashmap from  is from : http
 
 Upon unzipping the .zip including strmap.h, strmap.c, assembler.c, test_suite folder, README.md, and Makefile:
 * Run the following commands
-	...make
-	..../assembler <input file with assembly code for UST-3400> <Instructions Destination File>
+	  make  
+	  ./assembler input_file_with_assembly_code_for_UST-3400 Instructions_Destination_File  
 * You can also run
-	...make
-	..../assembler <input file>
+	   make  
+	   ./assembler input_file  
 to print the instructions rather than writing them into a destination file
 
 ## Test Suite
