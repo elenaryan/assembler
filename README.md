@@ -6,12 +6,12 @@ Computer Architecture (CISC340)
 Project 1 Part 1 10/15/2017
 
 
-##Procedure
+## Procedure
 Steps through the input code once, calculates and stores the addresses of all symbolic labels
 
 On second pass, construct UST3400 machine code, and if there is a destination file, write to it.  If not, print machine code.
 
-##Source and Includes
+## Source and Includes
 
 The hashmap used in this implementation is a string hashmap from  is from : http://pokristensson.com/strmap.html
 
@@ -26,24 +26,24 @@ Upon unzipping the .zip including strmap.h, strmap.c, assembler.c, test_suite fo
 	./assembler <input file>
 to print the instructions rather than writing them into a destination file
 
-##Test Suit
-*alpharegisters
+## Test Suit
+*	alpharegisters
 	
-*duplicates.txt
+* duplicates.txt
 
-*givenexample.txt
+* givenexample.txt
 	provides the given UST-3400 assembly instructions for testing
 
-*invalidlabel1.txt
+* invalidlabel1.txt
 
-*invalidlabel2.txt
+* invalidlabel2.txt
 
-*invalidlabel3.txt
+* invalidlabel3.txt
 
-*invalidopcode.txt
+* invalidopcode.txt
 	this tests two commands with invalid opcodes but proper registers and formatting
 
-*invalidregister.txt
+* invalidregister.txt
 	attempts to use an invalid register name for the destination field of add
 
 * text.txt
