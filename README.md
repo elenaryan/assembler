@@ -26,7 +26,7 @@ Upon unzipping the .zip including strmap.h, strmap.c, assembler.c, test_suite fo
 	./assembler <input file>
 to print the instructions rather than writing them into a destination file
 
-## Test Suit
+## Test Suite
 *	alpharegisters
 	
 * duplicates.txt
