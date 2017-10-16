@@ -27,16 +27,15 @@ Upon unzipping the .zip including strmap.h, strmap.c, assembler.c, test_suite fo
 to print the instructions rather than writing them into a destination file
 
 ## Test Suite
-*	alpharegisters
 	
-* duplicates.txt  
+* duplicates.txt 
 	checks for duplicate labels
 
-* givenexample.txt  
+* givenexample.txt 
 	provides the given UST-3400 assembly instructions for testing (tests lw, add, beq, noop, halt, and .fill)
 
 * otheroperations.txt  
-	tests for operations not used in any other tests (nand, sw, jalr)
+	tests for operations not used in any other tests (nand, sw, and jalr)
 
 * invalidlabel1.txt  
 	checks for labels that begin with numbers
@@ -53,7 +52,13 @@ to print the instructions rather than writing them into a destination file
 * invalidregister.txt  
 	attempts to use an invalid register (a register that does not exist)
 
-* alpharegisters  
+* alpharegisters.txt  
 	attempts to use an invalid register (one that is not a number)
+
+* invalidopcode.txt  
+	this tests two commands with invalid opcodes but proper registers and formatting
+
+* invalidregister.txt  
+	attempts to use an invalid register name for the destination field of add
 
 
