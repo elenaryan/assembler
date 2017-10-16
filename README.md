@@ -28,10 +28,10 @@ to print the instructions rather than writing them into a destination file
 
 ## Test Suite
 	
-* duplicates.txt 
+* duplicates.txt  
 	checks for duplicate labels
 
-* givenexample.txt 
+* givenexample.txt  
 	provides the given UST-3400 assembly instructions for testing (tests lw, add, beq, noop, halt, and .fill)
 
 * otheroperations.txt  
