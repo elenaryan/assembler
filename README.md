@@ -31,7 +31,7 @@ to print the instructions rather than writing them into a destination file
 	
 * duplicates.txt
 
-* givenexample.txt
+* givenexample.txt  
 	provides the given UST-3400 assembly instructions for testing
 
 * invalidlabel1.txt
@@ -40,13 +40,13 @@ to print the instructions rather than writing them into a destination file
 
 * invalidlabel3.txt
 
-* invalidopcode.txt
+* invalidopcode.txt  
 	this tests two commands with invalid opcodes but proper registers and formatting
 
-* invalidregister.txt
+* invalidregister.txt  
 	attempts to use an invalid register name for the destination field of add
 
-* text.txt
+* text.txt  
 	tests lw, add, beq, noop, nand, halt, .fill with and without labels, with all valid fields
 
 
