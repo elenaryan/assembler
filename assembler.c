@@ -11,6 +11,8 @@
  * Project Part I | 10/15/2017
 */
 
+int CheckRegisters(char*);
+
 int main(int argc, char **argv)
 {
 
@@ -21,7 +23,8 @@ int main(int argc, char **argv)
 
     if(argc == 1) {
         printf("No input given.\n");
-    } else if (argc == 2) {
+	return 0;
+    } else if (argc > 1 && argc <= 3 ) {
         FILE *f;
         f = fopen(argv[1], "r");
 
@@ -76,19 +79,18 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Label cannot be more than 6 characters.\n");
 				return 0;
 			}
-			// Checks for invalid opcodes -- not sure why this breaks test2.txt
-			/*char* token2 = strtok(write, " \t\n");
-			token2 = strtok(NULL, " \t");
-			if(strcmp(token2, "beq") != 0 && strcmp(token2, "add") != 0 && strcmp(token2, "nand") != 0 && strcmp(token2, "lw") != 0 && strcmp(token2, "sw") != 0 && strcmp(token2, "jalr") != 0 && strcmp(token2, "halt") != 0 && strcmp(token2, "noop") != 0 && strcmp(token2, ".fill") != 0)
+			// Checks for invalid opcodes -- 
+			char* token2 = token;
+			token = strtok(NULL, " \t\n");
+			if(strcmp(token, "beq") != 0 && strcmp(token, "add") != 0 && strcmp(token, "nand") != 0 && strcmp(token, "lw") != 0 && strcmp(token, "sw") != 0 && strcmp(token, "jalr") != 0 && strcmp(token, "halt") != 0 && strcmp(token, "noop") != 0 && strcmp(token, ".fill") != 0)
 			{
 				fprintf(stderr, "Opcode invalid.\n");
 				return 0;
-			}*/
-			printf("label is %s*** at line %d\n", token, mark);
+			}
                         char str[128];
                         sprintf(str, "%d", mark);
-                        sm_put(sm, token, str);
-                     }//inner absurd statement
+                        sm_put(sm, token2, str);
+                     }//inner statement
                     markold = mark; //so mark and markold only diverge for first token in a line
                 }
                 token = strtok(NULL, " \t\n");
@@ -98,136 +100,167 @@ int main(int argc, char **argv)
         fseek(f, 0, SEEK_SET);
 
         char parse[2048];
-
+	int instructions[mark]; //integer array of instructions
         int m = 0;//counts lines
         int inst;
         while(fgets(parse, 2048, f) != NULL) {
             char* tok = strtok(parse, " \t\n");
-            printf("in second pass %s\n", tok);
             if(sm_exists(sm, tok)!=0 || tok == NULL){
                 tok = strtok(NULL, " \t\n");
             }// if first tok is a label, move on
 
-            //printf("HERE WITH toke %s\n", tok);
 
             if(strcmp(tok, "add")==0) {
 		inst = 0 << 22;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = atoi(tok) | inst;//just throw an e
+                inst = atoi(tok) | inst;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = atoi(tok)<<19 | inst;//just throw an e
+                inst = atoi(tok)<<19 | inst;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = atoi(tok)<<16 | inst;//just throw an e
-                printf("line is %d and inst is %d\n", m, inst);
+                inst = atoi(tok)<<16 | inst;
+		instructions[m] = inst;
             }
 
             if(strcmp(tok, "nand")==0) {
                 inst = 1 << 22;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = atoi(tok) | inst;//just throw an e
+                inst = atoi(tok) | inst;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = atoi(tok)<<19 | inst;//just throw an e
+                inst = atoi(tok)<<19 | inst;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = atoi(tok)<<16 | inst;//just throw an e
-                printf("line is %d and inst is %d\n", m, inst);
+                inst = atoi(tok)<<16 | inst;
+                instructions[m] = inst;
             }
 
             if(strcmp(tok, "lw")==0) {
                 inst = 2 << 22;
-                //printf("stream
+                char buf[6];
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = (atoi(tok) <<19) | inst;//just throw an e
-                //printf("int is%d\n",inst);
+                inst = (atoi(tok) <<19) | inst;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = (atoi(tok)<<16) | inst;//just throw an e
-                //works exceps for labels
-                tok = strtok(NULL, " \t\n");
-                inst = atoi(tok) | inst;//just throw an e
-                printf("line is %d and inst is %d\n", m, inst);
+		inst = atoi(tok)<<16 | inst;
+		tok = strtok(NULL, " \t\n");
+		if(sm_get(sm, tok, buf, sizeof(buf)) != 0) {
+			inst = atoi(buf) | inst;
+		} else if(CheckRegisters(tok) == 0) {return 0;}
+		else {
+	        	inst = atoi(tok) | inst;
+                }
+		instructions[m] = inst;
             }
 
             if(strcmp(tok, "sw")==0) {
                 inst = 3 << 22;
+		char buf[6];
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = (atoi(tok) <<19) | inst;//just throw an e
-                //printf("int is%d\n",inst);
+                inst = (atoi(tok) <<19) | inst;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = (atoi(tok)<<16) | inst;//just throw an e
-                //works exceps for labels
-                tok = strtok(NULL, " \t\n");
-                inst = atoi(tok) | inst;//just throw an e
-                printf("line is %d and inst is %d\n", m, inst);
+		inst = (atoi(tok) <<16) | inst;
+		tok = strtok(NULL, " \t\n");
+		if(sm_get(sm, tok, buf, sizeof(buf)) != 0) {
+			inst = atoi(buf) | inst;
+		}else if(CheckRegisters(tok) == 0) {return 0;}
+                else {
+                        tok = strtok(NULL, " \t\n");
+                	inst = atoi(tok) | inst;
+                }
+		instructions[m] = inst;
             }
 
             if(strcmp(tok, "beq")==0) {
                 inst = 4 << 22;
+		char buf[6];
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = (atoi(tok) <<19) | inst;//just throw an e
-                //printf("int is%d\n",inst);
+                inst = (atoi(tok) <<19) | inst;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = (atoi(tok)<<16) | inst;//just throw an e
-                //works exceps for labels
-                tok = strtok(NULL, " \t\n");
-                inst = atoi(tok) | inst;//just throw an e
-                //printf("line is %d and inst is %d\n", m, inst);
-                printf("line is %d and inst is %d\n", m, inst);
+		inst = (atoi(tok) << 16)| inst;
+		tok = strtok(NULL, " \t\n");
+		if(sm_get(sm, tok, buf, sizeof(buf)) != 0) {
+			int a = atoi(buf);
+			a = a - (m+1);
+			a = a & 0xFFFF;
+			inst = a | inst;
+		}else {
+	         	inst = atoi(tok) | inst;
+                }
+                instructions[m] = inst;
             }
 
             if(strcmp(tok, "jalr")==0) {
                 inst = 5 << 22;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = atoi(tok)<<19 | inst;//just throw an e
+                inst = atoi(tok)<<19 | inst;
                 tok = strtok(NULL, " \t\n");
 		if(CheckRegisters(tok) == 0) {return 0;}
-                inst = atoi(tok)<<16 | inst;//just throw an e
-                //printf("line is %d and inst is %d\n", m, inst);
-                printf("line is %d and inst is %d\n", m, inst);
+                inst = atoi(tok)<<16 | inst;
+                instructions[m] = inst;
             }
 
             if(strcmp(tok, "halt")==0) {
                 inst = 6 << 22;
-                printf("line is %d and inst is %d\n", m, inst);
+		instructions[m] = inst;
             }
 
             if(strcmp(tok, "noop")==0) {
                 inst = 7 << 22;
-                printf("line is %d and inst is %d\n", m, inst);
+                instructions[m] = inst;
             }
+
             if(strcmp(tok, ".fill")==0) {
 		tok = strtok(NULL," \t\n");
-                inst = atoi(tok);//just throw an e
-                printf("line is %d and inst is %d\n", m, inst);
+		char buf[6];
+		if(sm_get(sm, tok, buf, sizeof(buf)) != 0) {
+			inst = atoi(buf);
+		} else {
+			inst = atoi(tok);
+		}
+                instructions[m] = inst;
              }
 
 
             while(tok) {
-                //printf("%s ", tok);
                 tok = strtok(NULL," \t\n");
-                //tm++;
             }
             m++;
 
         }
         fclose(f);
 
-    } else {
-        printf("Only enter one input file.\n");
-    }
+	if(argc == 3) {
+		//write out results to input file
+		FILE *fp;
+		fp = fopen(argv[2], "w+");
+		int i = 0;
+		while(i < m) {
+			fprintf(fp, "%d\n", instructions[i]);
+			i++;
+		}
+		fclose(fp);
+	} else {
+		int i = 0;
+		while(i < m) {
+		printf("%d\n", instructions[i]);
+		i++;
+		}
+	}//print to file
 
-    sm_delete(sm);
+    } else {
+        printf("Only enter two file inputs.\n");
+    }
+	sm_delete(sm);
     return 0;
 
 }//main
@@ -237,7 +270,7 @@ int CheckRegisters(char* tok)
 {
 	const char *badchars = "qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM~!@#$%^&*()_+=?<>{}[]|/";
 	int tok_num = atoi(tok);
-	if(strpbrk(tok, badchars) != 0 || tok_num < 8)
+	if(strpbrk(tok, badchars) != NULL || tok_num >= 8 || tok_num < 0)
 	{
 		fprintf(stderr, "Reg A and Reg B must be valid registers.\n");
 		return 0;

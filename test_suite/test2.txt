@@ -6,4 +6,5 @@ start	add	1	2	1	decrement reg1
 	noop
 done	halt
 five	.fill	5
-neg1	.fill	start
+neg1	.fill	-1
+stAdd	.fill	start
