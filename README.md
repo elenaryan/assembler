@@ -29,24 +29,31 @@ to print the instructions rather than writing them into a destination file
 ## Test Suite
 *	alpharegisters
 	
-* duplicates.txt
+* duplicates.txt  
+	checks for duplicate labels
 
-* givenexample.txt
-	provides the given UST-3400 assembly instructions for testing
+* givenexample.txt  
+	provides the given UST-3400 assembly instructions for testing (tests lw, add, beq, noop, halt, and .fill)
 
-* invalidlabel1.txt
+* otheroperations.txt  
+	tests for operations not used in any other tests (nand, sw, jalr)
 
-* invalidlabel2.txt
+* invalidlabel1.txt  
+	checks for labels that begin with numbers
 
-* invalidlabel3.txt
+* invalidlabel2.txt  
+	checks for labels that contain special characters
 
-* invalidopcode.txt
-	this tests two commands with invalid opcodes but proper registers and formatting
+* invalidlabel3.txt  
+	checks for labels greater than 6 characters
 
-* invalidregister.txt
-	attempts to use an invalid register name for the destination field of add
+* invalidopcode.txt  
+	tests a command with an invalid opcode but proper registers and formatting
 
-* text.txt
-	tests lw, add, beq, noop, nand, halt, .fill with and without labels, with all valid fields
+* invalidregister.txt  
+	attempts to use an invalid register (a register that does not exist)
+
+* alpharegisters  
+	attempts to use an invalid register (one that is not a number)
 
 

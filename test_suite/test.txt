@@ -1,8 +1,0 @@
-	lw	2	3	4
-lab	add	1	4	
-	beq	0	3	
-	noop	
-nice	nand	1	0	
-	halt	
-hur	.fill	5
-	nand
