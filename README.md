@@ -1,9 +1,9 @@
 # Assembler
 
-Using C to model an assembler of UST3400 machine language
-Elena Ryan and Jenna Olson
-Computer Architecture (CISC340)
-Project 1 Part 1 10/15/2017
+Using C to model an assembler of UST3400 machine language  
+Elena Ryan and Jenna Olson  
+Computer Architecture (CISC340)  
+Project 1 Part 1 10/15/2017  
 
 
 ## Procedure
