@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 	    while (token) {
                 if(mark != markold) {
                     //Check if first token is a label
-                    if(strcmp(token, "beq") != 0 && strcmp(token, "add") != 0 && strcmp(token, "nand") && strcmp(token, "lw")!= 0 && strcmp(token, "sw") != 0 && strcmp(token, "jalr")!=0 && strcmp(token, "halt") != 0 && strcmp(token, "noop")!= 0 && strcmp(token, ".fill") != 0) {
+                    if(strcmp(token, "beq") != 0 && strcmp(token, "add") != 0 && strcmp(token, "nand") && strcmp(token, "lw")!= 0 && strcmp(token, "sw") != 0 && strcmp(token, "jalr")!=0 && strcmp(token, "halt") != 0 && strcmp(token, "noop")!= 0 && strcmp(token, ".fill") != 0) { 
                         // Checking for invalid labels -- Beginning with a number
 			if(checker0 == token || checker1 == token || checker2 == token || checker3 == token || checker4 == token || checker5 == token || checker6 == token || checker7 == token || checker8 == token || checker9 == token)
 			{
@@ -93,6 +93,7 @@ int main(int argc, char **argv)
                      }//inner statement
                     markold = mark; //so mark and markold only diverge for first token in a line
                 }
+                //printf("%s\n", token);
                 token = strtok(NULL, " \t\n");
             }
             mark++;
@@ -271,7 +272,8 @@ int CheckRegisters(char* tok)
 	const char *badchars = "qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM~!@#$%^&*()_+=?<>{}[]|/";
 	int tok_num = atoi(tok);
 	if(strpbrk(tok, badchars) != NULL || tok_num >= 8 || tok_num < 0)
-	{
+	{   
+        printf("reg is %s\n", tok);
 		fprintf(stderr, "Reg A and Reg B must be valid registers.\n");
 		return 0;
 	}

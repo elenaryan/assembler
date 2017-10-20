@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "strmap.h"
-#include "strmap.c"
+
 
 /* 
  * Elena Ryan and Jenna Olson
