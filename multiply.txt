@@ -1,0 +1,25 @@
+mcand	.fill	29562			# Multiplicand
+mplier	.fill	11834			# Multiplier
+count	.fill	0			# Begin counter
+ans	.fill	0			# Place to store answer
+cap	.fill	15			# End counter value
+inc	.fill	1			# Store 1 so we can increment count
+	lw	1	0	mcand	# Load reg1 with mcand
+	lw	2	0	mplier	# Load reg2 with mplier
+	lw	3	0	count	# Load reg3 with count
+	lw	4	0 	cap	# Load reg4 with cap
+	lw	5	0	ans	# Load reg5 with answer
+	lw	6	0	inc	# Load reg6 with inc
+		
+loop	beq	3	4	end	# If count is 15, end loop
+	nand	7	2	(bit?)	# Nand mplier with the bit?
+	beq	7		mult	# If the bit is 1... ?
+	add	1	1	1	# Mult = mult + mult
+mult	add	5	5	1	# Ans = ans + mult		
+	add	3	3	6	# Increment count
+	jalr	loop			# Go back to beginning of the loop	
+
+end		
+
+	
+	
