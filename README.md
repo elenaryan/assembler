@@ -91,3 +91,5 @@ The main method determines each opcode and sends the instruction to the appropri
       ./simulator ASSEMBLED_TEST_FILE  
 * Run the following optional command to clean up all .o and executables  
       make clean
+
+## Test Suite
