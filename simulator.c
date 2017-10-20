@@ -14,38 +14,78 @@
  * In the form of decimal numbers
  * Parses out opcodes and executes instructions
  *
+ */
+#define NUMREGS 8
+#define NUMMEMORY 65536
 
 
-
-
-
- * Given functions:
-
-
- * offset field number convertor 
- *
- * int convertNum(int num) {
-        if(num &(1<<15)) {
-            num-=(1<<16);
-        }
-    return num;
-    }
-
-
-
- * state struct
- *
- * typedef struct stateStruct {
+typedef struct stateStruct {
        int pc;
+       
        int mem[NUMMEMORY];
        int reg[NUMREGS];
        int numMemory;
     } stateType;
 
+void printState(stateType *statePTr);
 
- * print state
- *
- * void printState(stateType *statePTr) {
+
+int convertNum(int num);
+
+
+
+int main(int argc, char **argv)
+{
+
+    stateType stat;
+    int i = 0;
+    //printf("MADE IT AFTER ALL\n");
+    while(i<NUMREGS){
+        stat.reg[i] = 0;
+        i++;
+    }// init regs to 0;
+    //printf("after regs");
+    int j = 0;//mem counter
+    if(argc == 1) {
+        printf("No input given.\n");
+	    return 0;
+    } else if (argc == 2 ) {
+        FILE *f;
+        f = fopen(argv[1], "r");
+
+        if (f == NULL)   {
+            printf("Invalid file or path.\n");
+            exit(0);
+        }
+        i = 0;
+        fscanf(f, "%d", &i);
+        while (!feof(f)) {
+            stat.mem[j] = i;
+            printf("At memory address %d is: %d\n", j, i);
+            fscanf(f, "%d", &i);
+            j++;            
+        }
+        fclose(f);
+    } else {
+        printf("Too many inputs given");
+    }//end file reading and memory initialization
+
+    stat.numMemory = j;//actual necessary mem size
+    //probably toss an error if this exceeds machine memory
+
+
+
+    stat.pc = 0;//initialize program counter
+
+    //while pc (maybe plus 1) is less than file size
+
+    return 0;
+}//main
+
+
+
+
+void printState(stateType *statePtr) {
         int i;
         printf("\n@@@\nstate:\n");
         printf("\tpc %d\n", statePtr->pc);
@@ -59,70 +99,13 @@
         }
         printf("end state\n");
 }
-*/
-#define NUMREGS 8
-#define numMemory 65536
-int main(int argc, char **argv)
-{
 
-    if(argc == 1) {
-        printf("No input given.\n");
-	    return 0;
-    } else if (argc == 2 ) {
-        FILE *f;
-        f = fopen(argv[1], "r");
 
-        if (f == NULL)   {
-            printf("Invalid file or path.\n");
-            exit(0);
+int convertNum(int num) {
+        if(num &(1<<15)) {
+            num-=(1<<16);
         }
+    return num;
+    }
 
-        //primary execution goes here
-        int i = 0;
-        fscanf(f, "%d", &i);
-
-        while (!feof(f)) {
-            //printf("%d\n", i);
-
-        
-            int op = i>>22;
-            //Might have to do some additional error checking to avoid .fill stuff
-            switch(op) {
-                case 0:
-                    printf("command is add\n");
-                    break;
-                case 1:
-                    printf("nand\n");
-                    break;
-                case 2:
-                    printf("lw\n");
-                    break;
-                case 3:
-                    printf("sw\n");
-                    break;
-                case 4:
-                    printf("beq\n");
-                    break;
-                case 5:
-                    printf("jalr\n");
-                    break;
-                case 6:
-                    printf("halt\n");
-                    break;
-                case 7:
-                    printf("noop\n");
-                    break;
-            }//switch
-
-
-            fscanf(f, "%d", &i);
-        }
-        fclose(f);
-    } else {
-        printf("Too many inputs given");
-
-
-    }//end file reading
-    return 0;
-}//main
 
