@@ -133,7 +133,8 @@ int main(int argc, char **argv)
                    
         } else {
             stat.pc++;
-        }
+       }
+        printState(&stat);
     }//end while
 
     return 0;
