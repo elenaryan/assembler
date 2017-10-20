@@ -13,6 +13,10 @@
  * In the form of decimal numbers
  * Parses out opcodes and executes instructions
  *
+ * The main method takes the file input and loads
+ * to memory.  As it steps through, the program identifies each
+ * opcode and executes the instruction by parsing out registers
+ * and immediates and updating the registers and memory accordingly
  */
 
 #define NUMREGS 8
@@ -42,15 +46,18 @@ void beq(int inst, stateType *statePtr);
 
 void jalr(int inst, stateType *statePtr);
 
+void print_stats(int n_instrs);
+
 int main(int argc, char **argv)
 {
 
     stateType stat;
     int i = 0;
-
+    int j = 0;
     while(i<NUMREGS){
         stat.reg[i] = 0;
         i++;
+    }
         if(argc == 1) {
             printf("No input given.\n");
 	        return 0;
@@ -72,15 +79,17 @@ int main(int argc, char **argv)
             fclose(f);
         } else {
             printf("Too many inputs given");
+    
         }//end file reading and memory initialization
 
         stat.numMemory = j;//actual necessary mem size
         stat.pc = 0;//initialize program counter
-
+        int c = 0;//inst counter
     while(stat.pc < stat.numMemory) {
         
        if(stat.mem[stat.pc] > 32767) {
           int op = stat.mem[stat.pc]>>22;
+          c++;
           if(op == 0) {
              add(stat.mem[stat.pc], &stat);
              stat.pc++;
@@ -108,7 +117,7 @@ int main(int argc, char **argv)
         }//takes .fill into account
         printState(&stat);
     }//end while
-
+    print_stats(c);
     return 0;
 }//main
 
@@ -175,7 +184,8 @@ void printState(stateType *statePtr) {
             printf("\t\treg[%d]=%d\n", i, statePtr->reg[i]);
         }
         printf("end state\n");
-}
+}//printState
+
 
 
 int convertNum(int num) {
@@ -183,6 +193,9 @@ int convertNum(int num) {
             num-=(1<<16);
         }
     return num;
-    }
+}//convertNum
 
+void print_stats(int n_instrs) {
+    printf("INSTRUCTIONS: %d\n", n_instrs);
+}//print_stats
 
