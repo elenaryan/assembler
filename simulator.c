@@ -21,7 +21,6 @@
 
 typedef struct stateStruct {
        int pc;
-       
        int mem[NUMMEMORY];
        int reg[NUMREGS];
        int numMemory;
@@ -39,7 +38,7 @@ int main(int argc, char **argv)
 
     stateType stat;
     int i = 0;
-    //printf("MADE IT AFTER ALL\n");
+
     while(i<NUMREGS){
         stat.reg[i] = 0;
         i++;
@@ -77,7 +76,46 @@ int main(int argc, char **argv)
 
     stat.pc = 0;//initialize program counter
 
-    //while pc (maybe plus 1) is less than file size
+    while(stat.pc < stat.numMemory) {
+        
+       //put all of the appropriate commands here
+        /*HERE's WHAT NEEDS TO HAPPEN:
+            1. evaluate each opcode, esp make sure that we can tell the difference
+                bt add and .fills
+            2. update all necessary state variables
+            3. print state
+        */
+
+        //implement switch, but also discern bt opcode and fill int somehow...
+        //or with 32 bits ones to ensure its more than an immediate value or just >32767
+
+        if(stat.mem[stat.pc] > 32767) {
+            //just makes sure we're using real instructions not .fills
+            int op = stat.mem[stat.pc]>>22;
+            printf("opcodes %d\n", op);
+            if(op == 0) {
+            //add
+            } else if(op == 1) {
+            //nand
+            } else if(op == 2) {
+            //lw
+            } else if(op == 3) {
+            //sw
+            } else if(op == 4) {
+            //beq
+            } else if(op == 5) {
+            //jalr
+            } else if(op == 6) {
+                stat.pc++;
+            } else if(op == 7) {
+                stat.pc++;
+            } 
+            
+                   
+        } else {
+            stat.pc++;
+        }
+    }//end while
 
     return 0;
 }//main
