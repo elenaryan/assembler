@@ -1,23 +1,23 @@
 	lw	1	0	mcand	# Load reg1 with mcand
 	lw	2	0	mplier	# Load reg2 with mplier
 	lw	3	0	count	# Load reg3 with count
-	lw	4	0 	cap	# Load reg4 with cap
-	lw	5	0	ans	# Load reg5 with answer
-	lw	6	0	inc	# Load reg6 with inc		
+	lw	4	0 	cap     # Load reg4 with cap
+	lw	5	0	ans	    # Load reg5 with answer
+	lw	6	0	inc	    # Load reg6 with inc		
 loop	beq	6	4	end	# If bit tester is > 15 bits
 	nand	7	2	6	# Nand mplier with the bit?
-    nand    3   2   0 #nand mult with 0
+    nand    3   2   0   #nand mult with 0
     nand    7   7   3   #nand all 1s with result
 	beq 7	0	mult	# result nand mplier is equal to 0
-    add 5   5   1   #add mcand to answer
+    add 5   5   1       #add mcand to answer
 mult    add	6   6   6	# shift test bit
-    add 1   1   1   #add mcand to itselt
+    add 1   1   1       #add mcand to itselt
     lw  3   0   count   
 	jalr  7 3			# Go back to beginning of the loop	
 end halt	
-mcand	.fill	29562			# Multiplicand
-mplier	.fill	11834			# Multiplier
-count	.fill	6			# Begin counter
-ans	    .fill	0			# Place to store answer
-cap	    .fill	32768			# End counter value
-inc	    .fill	1			# Store 1 so we can increment
+mcand	.fill	29562	# Multiplicand
+mplier	.fill	11834	# Multiplier
+count	.fill	6		# Begin counter
+ans	    .fill	0		# Place to store answer
+cap	    .fill	32768	# End counter value
+inc	    .fill	1		# Store 1 so we can increment
