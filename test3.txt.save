@@ -1,0 +1,18 @@
+	lw	1	0	mcand	# load reg1 with mcand
+	lw	2	0	mplier	# load reg2 with mplier
+	lw	3	0	count	# load reg3 with count
+	lw	4	0 	cap     # load reg4 with cap
+	lw	7	0	ans	# load reg5 with answer
+	lw	6	0	inc	# load reg6 with inc		
+loop	beq	6	4	end	# if bit tester is > 15 bits
+	add
+mult    add	6   	6   	6	# shift test bit
+    	add 	   
+	jalr  	5 	3		# Go back to beginning of the loop	
+end halt	
+mcand	.fill	29562	# Multiplicand
+mplier	.fill	11834	# Multiplier
+count	.fill	6	# Begin counter
+ans	.fill	0	# Place to store answer
+cap	.fill	32768	# End counter value
+inc	.fill	1	# Store 1 so we can increment

@@ -5,7 +5,7 @@
 loop	beq	1	2	end	# if a = b
 	add	1	1	6	# Decrement  a
 	jalr  	5 	3		# Go back to beginning of the loop	
-end halt	
+end 	halt	
 a	.fill	50	
 b	.fill	5
 count	.fill	4	# Begin counter
