@@ -1,14 +1,1 @@
-	lw	1	0	five	# load reg1 with 5
-	lw	2	0	ten	# load reg2 with 10
-	lw	3	0	one	# load reg3 with 1
-	lw	4	0	reg	# load reg4 with the address of the loop
-loop	beq	1	2	end	# end loop if reg1 = reg2
-	add	1	1	3	# increment reg1 by 1
-	jalr	7	4		# jumps to the beginning of the loop
-end	halt
-five	.fill	5
-ten	.fill	10
-one	.fill	1
-reg	.fill	4
-
-
+     
