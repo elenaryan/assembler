@@ -30,8 +30,11 @@ The main method determines each opcode and sends the instruction to the appropri
       make clean
 
 ## Test Suite
-*
+* test1.txt  
+	Tests lw, beq, add, jalr, halt, and .fill by decrementing a variable in a loop 
 
-*
+* test2.txt   
+	Tests lw, sw, add, nand, beq, jalr, noop, halt, and .fill by decrementing until reg1 = 0
 
-*
+* test3.txt  
+	Tests lw, beq, add, jalr, and .fill through incrementing a variable in a loop
