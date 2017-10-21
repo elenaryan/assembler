@@ -9,7 +9,7 @@ loop	beq	1	2	end	# if a = b
 	jalr  	5 	3		# Go back to beginning of the loop	
 end halt	
 a	.fill	5	
-b	.fill	10
+b	.fill	20
 count	.fill	6	# Begin counter
 ans	.fill	0	# Place to store answer
 cap	.fill	32768	# End counter value

@@ -1,1 +1,12 @@
-     
+	lw	1	0	a	# load reg1 with a
+	lw	2	0	b	# load reg2 with b
+	lw	3	0	count	# load reg3 with count
+	lw	6	0	inc	# load reg6 with inc		
+loop	beq	1	2	end	# if a = b
+	add	1	1	6	# Decrement  a
+	jalr  	5 	3		# Go back to beginning of the loop	
+end halt	
+a	.fill	50	
+b	.fill	5
+count	.fill	4	# Begin counter
+inc	.fill	-5	# Store -5 so we can increment
