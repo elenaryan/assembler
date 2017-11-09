@@ -1,16 +1,18 @@
-  
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 // ******************* WORKING OFF OF THE ORIGINAL SIMULATOR ****************//
 
-/* 
+/*
  * Elena Ryan and Jenna Olson
  * Computer Architecture
  * Pipelined simulator
- * Project 3 | 11/8/2017
- * 
+ * Project 3 | 11/20/2017
+ *
+ * // May need to change this description
+ *
  * Takes as input a file of assembled machine code
  * In the form of decimal numbers
  * Parses out opcodes and executes instructions
@@ -21,10 +23,69 @@
  * and immediates and updating the registers and memory accordingly
  */
 
-#define NUMREGS 8
-#define NUMMEMORY 65536
 
+#define NUMMEMORY 65536 /* maximum number of data words in memory */
+#define NUMREGS 8 /* number of machine registers */
+#define ADD 0
+#define NAND 1
+#define LW 2
+#define SW 3
+#define BEQ 4
+#define HALT 6
+#define NOOP 7
 
+#define NOOPINSTRUCTION 0x1c00000
+
+typedef struct IFIDstruct{
+	int instr;
+	int pcPlus1;
+} IFIDType;
+
+typedef struct IDEXstruct{
+	int instr;
+	int pcPlus1;
+	int readRegA;
+	int readRegB;
+	int offset;
+} IDEXType;
+
+typedef struct EXMEMstruct{
+	int instr;
+	int branchTarget;
+	int aluResult;
+	int readReg;
+} EXMEMType;
+
+typedef struct MEMWBstruct{
+	int instr;
+	int writeData;
+} MEMWBType;
+
+typedef struct WBENDstruct{
+	int instr;
+	int writeData;
+} WBENDType;
+
+typedef struct statestruct{
+	int pc;
+	int instrMem[NUMMEMORY];
+	int dataMem[NUMMEMORY];
+	int reg[NUMREGS];
+	int numMemory;
+	IFIDType IFID;
+	IDEXType IDEX;
+	EXMEMType EXMEM;
+	MEMWBType MEMWB;
+	WBENDType WBEND;
+	int cycles; /* Number of cycles run so far */
+	int fetched; /* Total number of instructions fetched */
+	int retired; /* Total number of completed instructions */
+	int branches; /* Total number of branches executed */
+	int mispreds; /* Number of branch mispredictions*/
+} stateType;
+
+// Will probably need to take this struct out, replace with the one directly above from the instruction packet
+// Myre uses dataMem instead of mem, we'll need to choose one to use consistently
 typedef struct stateStruct {
        int pc;
        int mem[NUMMEMORY];
@@ -74,19 +135,19 @@ int main(int argc, char **argv)
             while (!feof(f) && j< NUMMEMORY) {
                 stat.mem[j] = i;
                 fscanf(f, "%d", &i);
-                j++;            
+                j++;
             }
             fclose(f);
         } else {
             printf("Too many inputs given");
-    
+
         }//end file reading and memory initialization
 
         stat.numMemory = j;//actual necessary mem size
         stat.pc = 0;//initialize program counter
         int c = 0;//inst counter
     while(stat.pc < stat.numMemory) {
-        
+
        if(stat.mem[stat.pc] > 32767) {
           int op = stat.mem[stat.pc]>>22;
           c++;
@@ -109,7 +170,7 @@ int main(int argc, char **argv)
              stat.pc++;
           } else if(op == 7) {
              stat.pc++;
-          }      
+          }
         } else {
             stat.pc++;
         }//takes .fill into account
@@ -163,19 +224,92 @@ void beq(int inst, stateType *statePtr) {
 
 void printState(stateType *statePtr) {
         int i;
-        printf("\n@@@\nstate:\n");
+        printf("\n@@@\nstate before cycle %d starts\n", statePtr->cycles);
         printf("\tpc %d\n", statePtr->pc);
+
         printf("tmemory:\n");
         for(i=0; i<statePtr->numMemory; i++) {
-            printf("\t\tmem[%d]=%d\n", i, statePtr->mem[i]);
+            printf("\t\tdataMem[%d]%d\n", i, statePtr->dataMem[i]);
         }
+
         printf("\tregisters:\n");
         for(i=0; i<NUMREGS;i++) {
-            printf("\t\treg[%d]=%d\n", i, statePtr->reg[i]);
+            printf("\t\treg[%d]%d\n", i, statePtr->reg[i]);
         }
+
+	printf("\tIFID:\n");
+		printf("\t\tinstruction ");
+		printInstruction(statePtr->IFID.instr);
+		printf("\t\tpcPlus1 %d\n", statePtr->IFID.pcPlus1);
+
+	printf("\tIDEX:\n");
+		printf("\t\tinstruction");
+		printInstruction(statePtr->IDEX.instr);
+		printf("\t\tpcPlus1 %d\n", statePtr->IDEX.pcPlus1);
+		printf("\t\treadRegA %d\n", statePtr->IDEX.readRegA);
+		printf("\t\treadRegB %d\n", statePtr->IDEX.readRegB);
+		printf("\t\toffset %d\n", statePtr->IDEX.offset);
+
+	printf("\tMEMWB:\n");
+		printf("\t\tinstruction ");
+		printInstruction(statePtr->MEMWB.instr);
+		printf("\t\twriteData %d\n", statePtr->MEMWB.writeData);
+	printf("\tWBEND:\n");
+		printf("\t\tinstruction ");
+		printInstruction(statePtr->WBEND.instr);
+		printf("\t\twriteData %d\n", statePtr->WBEND.writeData);
+
         printf("end state\n");
 }//printState
 
+
+void printInstruction(int instr) {
+	char opcodeString[10];
+	if (opcode(instr) == ADD) {
+		strcpy(opcodeString, "add");
+	} else if (opcode(instr) == NAND) {
+		strcpy(opcodeString, "nand");
+	} else if (opcode(instr) == LW) {
+		strcpy(opcodeString, "lw");
+	} else if (opcode(instr) == SW) {
+		strcpy(opcodeString, "sw");
+	} else if (opcode(instr) == BEQ) {
+		strcpy(opcodeString, "beq");
+	} else if (opcode(instr) == JALR) {
+		strcpy(opcodeString, "jalr");
+	} else if (opcode(instr) == HALT) {
+		strcpy(opcodeString, "halt");
+	} else if (opcode(instr) == NOOP) {
+		strcpy(opcodeString, "noop");
+	} else {
+		strcpy(opcodeString, "data");
+	}
+
+	if(opcode(instr) == ADD || opcode(instr) == NAND){
+		printf("%s %d %d %d\n", opcodeString, field2(instr), field0(instr), field1(instr));
+	}else if(0 == strcmp(opcodeString, "data")){
+		printf("%s %d\n", opcodeString, signExtend(field2(instr)));
+	}else{
+		printf("%s %d %d %d\n", opcodeString, field0(instr), field1(instr),
+			signExtend(field2(instr)));
+}//printInstruction
+
+
+int field0(int instruction){
+	return( (instruction>>19) & 0x7);
+}
+
+int field1(int instruction){
+	return( (instruction>>16) & 0x7);
+}
+
+int field2(int instruction){
+	return(instruction & 0xFFFF);
+}
+
+int opcode(int instruction){
+	return(instruction>>22);
+}
 
 
 int convertNum(int num) {
