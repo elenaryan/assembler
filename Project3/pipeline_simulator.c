@@ -86,13 +86,13 @@ typedef struct statestruct{
 
 // Will probably need to take this struct out, replace with the one directly above from the instruction packet
 // Myre uses dataMem instead of mem, we'll need to choose one to use consistently
-typedef struct stateStruct {
+/*typedef struct stateStruct {
        int pc;
        int mem[NUMMEMORY];
        int reg[NUMREGS];
        int numMemory;
     } stateType;
-
+*/
 void printState(stateType *statePTr);
 
 int convertNum(int num);
@@ -113,8 +113,25 @@ int main(int argc, char **argv)
 {
 
     stateType stat;
+    stateType newstat;
+   /** IFIDType ifid;
+    IDEXType ides;
+    EXMEMType exmem;
+    MEMWBType memwb;
+    WBENDType wbend;
+
+**/
+
     int i = 0;
     int j = 0;
+    /***initialize everything to NOOP in here***/
+    stat.ifid.instr = NOOPINSTRUCTION;
+    stat.ides.instr = NOOPINSTRUCTION;
+    stat.exmem.instr = NOOPINSTRUCTION;
+    stat.memwb.instr = NOOPINSTRUCTION;
+    stat.wbend.instr = NOOPINSTRUCTION;
+
+
     while(i<NUMREGS){
         stat.reg[i] = 0;
         i++;
@@ -133,7 +150,7 @@ int main(int argc, char **argv)
             i = 0;
             fscanf(f, "%d", &i);
             while (!feof(f) && j< NUMMEMORY) {
-                stat.mem[j] = i;
+                stat.instrMem[j] = i;
                 fscanf(f, "%d", &i);
                 j++;
             }
@@ -143,10 +160,65 @@ int main(int argc, char **argv)
 
         }//end file reading and memory initialization
 
+
+        /***THIS IS WHERE LOOP 2 STARTS***/
+
         stat.numMemory = j;//actual necessary mem size
         stat.pc = 0;//initialize program counter
         int c = 0;//inst counter
-    while(stat.pc < stat.numMemory) {
+
+
+        while(1) {
+            
+            printState(&stat);
+            /*checking for halt*/
+
+            if(HALT == opcode(state.MEMWB.instr)) {
+                printf(“machine halted\n”);
+                printf(“total of %d cycles executed\n”, state.cycles);
+                printf("total of %d instructions fetched\n", state.fetched);
+                printf("total of %d instructions retured\n", state.retired);
+                printf("total of %d branches executed\n", state.branches);
+                printf("total of %d branch mispredictions\n", state.mispreds);
+                exit(0);
+            }
+            newState = state;
+            newState.cycles++;
+/*------------------ IF stage ----------------- */
+
+
+
+
+/*------------------ ID stage ----------------- */
+
+
+
+/*------------------ EX stage ----------------- */
+
+
+
+
+/*------------------ MEM stage ----------------- */
+
+
+
+
+/*------------------ WB stage ----------------- */
+
+
+
+        state = newState; /* this is the last statement before the end of the loop.
+It marks the end of the cycle and updates the current
+state with the values calculated in this cycle
+– AKA “Clock Tick”. */
+
+
+
+
+
+        }//end while
+        
+    /**while(stat.pc < stat.numMemory) {
 
        if(stat.mem[stat.pc] > 32767) {
           int op = stat.mem[stat.pc]>>22;
@@ -175,7 +247,7 @@ int main(int argc, char **argv)
             stat.pc++;
         }//takes .fill into account
         printState(&stat);
-    }//end while
+    }//end while **/
     print_stats(c);
     return 0;
 }//main
@@ -249,8 +321,13 @@ void printState(stateType *statePtr) {
 		printf("\t\treadRegA %d\n", statePtr->IDEX.readRegA);
 		printf("\t\treadRegB %d\n", statePtr->IDEX.readRegB);
 		printf("\t\toffset %d\n", statePtr->IDEX.offset);
-
-	printf("\tMEMWB:\n");
+   printf("\tEXMEM:\n");
+        printf("\t\tinstruction ");
+        printInstruction(statePtr->EXMEM.instr);
+        printf("\t\tbranchTarget %d\n", statePtr->EXMEM.branchTarget);
+        printf("\t\taluResult %d\n", statePtr->EXMEM.aluResult);
+        printf("\t\treadRegB %d\n", statePtr->EXMEM.readReg);
+    printf("\tMEMWB:\n");
 		printf("\t\tinstruction ");
 		printInstruction(statePtr->MEMWB.instr);
 		printf("\t\twriteData %d\n", statePtr->MEMWB.writeData);
