@@ -2,10 +2,10 @@ CC=gcc
 CFLAGS=-pipe
 INC=
 
-all: pipeline_simulator
+all: pipelinesimulator
 	$(CC) $(CFLAGS) pipeline_simulator.o -o pipeline_simulator
 
-simulator: pipeline_simulator.c
+pipelinesimulator: pipeline_simulator.c
 	$(CC) $(CFLAGS) -c pipeline_simulator.c
 
 clean:

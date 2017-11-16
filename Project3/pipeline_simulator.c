@@ -31,6 +31,7 @@
 #define LW 2
 #define SW 3
 #define BEQ 4
+#define JALR 5 /*not implemented*/
 #define HALT 6
 #define NOOP 7
 
@@ -107,13 +108,25 @@ void sw(int inst, stateType *statePtr);
 
 void beq(int inst, stateType *statePtr);
 
+int opcode(int instruction);
+
 void print_stats(int n_instrs);
+
+int signExtend(int num);
+
+int field0(int instruction);
+
+int field1(int instruction);
+
+int field2(int instruction);
+
+void printInstruction(int instr);
 
 int main(int argc, char **argv)
 {
 
-    stateType stat;
-    stateType newstat;
+    stateType state;
+    stateType newState;
    /** IFIDType ifid;
     IDEXType ides;
     EXMEMType exmem;
@@ -125,15 +138,15 @@ int main(int argc, char **argv)
     int i = 0;
     int j = 0;
     /***initialize everything to NOOP in here***/
-    stat.ifid.instr = NOOPINSTRUCTION;
-    stat.ides.instr = NOOPINSTRUCTION;
-    stat.exmem.instr = NOOPINSTRUCTION;
-    stat.memwb.instr = NOOPINSTRUCTION;
-    stat.wbend.instr = NOOPINSTRUCTION;
+    state.IFID.instr = NOOPINSTRUCTION;
+    state.IDEX.instr = NOOPINSTRUCTION;
+    state.EXMEM.instr = NOOPINSTRUCTION;
+    state.MEMWB.instr = NOOPINSTRUCTION;
+    state.WBEND.instr = NOOPINSTRUCTION;
 
 
     while(i<NUMREGS){
-        stat.reg[i] = 0;
+        state.reg[i] = 0;
         i++;
     }
         if(argc == 1) {
@@ -150,7 +163,7 @@ int main(int argc, char **argv)
             i = 0;
             fscanf(f, "%d", &i);
             while (!feof(f) && j< NUMMEMORY) {
-                stat.instrMem[j] = i;
+                state.instrMem[j] = i;
                 fscanf(f, "%d", &i);
                 j++;
             }
@@ -163,19 +176,19 @@ int main(int argc, char **argv)
 
         /***THIS IS WHERE LOOP 2 STARTS***/
 
-        stat.numMemory = j;//actual necessary mem size
-        stat.pc = 0;//initialize program counter
+        state.numMemory = j;//actual necessary mem size
+        state.pc = 0;//initialize program counter
         int c = 0;//inst counter
 
 
         while(1) {
             
-            printState(&stat);
+            printState(&state);
             /*checking for halt*/
 
             if(HALT == opcode(state.MEMWB.instr)) {
-                printf(“machine halted\n”);
-                printf(“total of %d cycles executed\n”, state.cycles);
+                printf("machine halted\n");
+                printf("total of %d cycles executed\n", state.cycles);
                 printf("total of %d instructions fetched\n", state.fetched);
                 printf("total of %d instructions retured\n", state.retired);
                 printf("total of %d branches executed\n", state.branches);
@@ -252,7 +265,7 @@ state with the values calculated in this cycle
     return 0;
 }//main
 
-
+/*
 void add(int inst, stateType *statePtr) {
     int dest = (inst & 7);
     int regA = (inst >> 19) & 7;
@@ -293,7 +306,7 @@ void beq(int inst, stateType *statePtr) {
     }
 }//beq
 
-
+*/
 void printState(stateType *statePtr) {
         int i;
         printf("\n@@@\nstate before cycle %d starts\n", statePtr->cycles);
@@ -369,6 +382,7 @@ void printInstruction(int instr) {
 	}else{
 		printf("%s %d %d %d\n", opcodeString, field0(instr), field1(instr),
 			signExtend(field2(instr)));
+    }
 }//printInstruction
 
 
@@ -396,7 +410,19 @@ int convertNum(int num) {
     return num;
 }//convertNum
 
+
+int signExtend(int num){
+    // convert a 16-bit number into a 32-bit integer
+    if (num & (1<<15) ) {
+        num -= (1<<16);
+    }
+    return num;
+}//signExtend
+
+
+
+
 void print_stats(int n_instrs) {
     printf("INSTRUCTIONS: %d\n", n_instrs);
-}//print_stats
+}//print_stats*/
 
