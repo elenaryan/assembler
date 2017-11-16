@@ -211,6 +211,7 @@ int main(int argc, char **argv)
             newState.IDEX.readRegA = field0(state.IFID.instr);
             newState.IDEX.readRegB = field1(state.IFID.instr);// Set sign extended offsetoffset = signExtend(field2(instr));
             newState.IDEX.offset = field2(state.IFID.instr); 
+            //newState.IDEX.pcPlus1 = what in the hell? state.IFID.pcPlus1 + 1;
 
 /*------------------ EX stage ----------------- */
             newState.EXMEM.instr = state.IDEX.instr;
