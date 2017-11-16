@@ -121,6 +121,11 @@ int field1(int instruction);
 int field2(int instruction);
 
 void printInstruction(int instr);
+void IFID(stateType *state, stateType *newState);
+void IDEX(stateType *state, stateType *newState);
+void EXMEM(stateType *state, stateType *newState);
+void MEMWB(stateType *state, stateType *newState);
+void WBEND(stateType *state, stateType *newState);
 
 int main(int argc, char **argv)
 {
@@ -198,34 +203,28 @@ int main(int argc, char **argv)
             //newState = state;
             //newState.cycles++;
 /*------------------ IF stage ----------------- */
-            newState.IFID.instr = state.instrMem[state.IFID.pcPlus1];
-            newState.IFID.pcPlus1 = state.IFID.pcPlus1 +1;
-            newState.fetched = state.fetched+1;
+            IFID(&state, &newState);
             
 
 
 
 /*------------------ ID stage ----------------- */
-            newState.IDEX.instr = state.IFID.instr;
-            // Set reg A and B
-            newState.IDEX.readRegA = field0(state.IFID.instr);
-            newState.IDEX.readRegB = field1(state.IFID.instr);// Set sign extended offsetoffset = signExtend(field2(instr));
-            newState.IDEX.offset = field2(state.IFID.instr); 
-            //newState.IDEX.pcPlus1 = what in the hell? state.IFID.pcPlus1 + 1;
+            IDEX(&state, &newState);
+            
 
 /*------------------ EX stage ----------------- */
-            newState.EXMEM.instr = state.IDEX.instr;
+            EXMEM(&state, &newState);
 
 
 
 /*------------------ MEM stage ----------------- */
-            newState.MEMWB.instr = state.EXMEM.instr;
-
+            //newState.MEMWB.instr = state.EXMEM.instr;
+            MEMWB(&state, &newState);
 
 
 /*------------------ WB stage ----------------- */
-            newState.WBEND.instr = state.MEMWB.instr;
-            
+            //newState.WBEND.instr = state.MEMWB.instr;
+            WBEND(&state, &newState);
 
 
         state = newState; /* this is the last statement before the end of the loop.
@@ -409,6 +408,58 @@ int field2(int instruction){
 int opcode(int instruction){
 	return(instruction>>22);
 }
+void IFID(stateType *state, stateType *newState) {
+    //PROGRAM COUNTER COULD BE WEIRD
+    newState->pc = state->IFID.pcPlus1;
+    newState->IFID.instr = state->instrMem[state->pc];
+    newState->IFID.pcPlus1 = state->IFID.pcPlus1+1;
+    newState->fetched = state->fetched+1;
+
+}//IFID
+void IDEX(stateType *state, stateType *newState) {
+    newState->IDEX.instr = state->IFID.instr;
+    newState->IDEX.readRegA = state->reg[field0(state->IFID.instr)];//actually you have to find what is here
+    newState->IDEX.readRegB = state->reg[field1(state->IFID.instr)];//what is in this register
+    newState->IDEX.offset = signExtend(field2(state->IFID.instr));
+    newState->IDEX.pcPlus1 = state->IFID.pcPlus1;
+    
+}//IDEX
+void EXMEM(stateType *state, stateType *newState) {
+    newState->EXMEM.instr = state->IDEX.instr;
+    newState->EXMEM.branchTarget = state->IDEX.offset+state->IDEX.pcPlus1;
+    newState->EXMEM.readReg = state->IDEX.readRegA;//this is the contents of reg b
+    if (opcode(state->IDEX.instr) == ADD) {
+        newState->EXMEM.aluResult = state->IDEX.readRegA + state->IDEX.readRegB;
+    } else if (opcode(state->IDEX.instr) == NAND) {
+        newState->EXMEM.aluResult = !(state->IDEX.readRegA & state->IDEX.readRegB);
+    } else if (opcode(state->IDEX.instr) == SW || opcode(state->IDEX.instr)== LW) {
+        newState->EXMEM.aluResult = state->IDEX.readRegB + state->IDEX.offset;
+    } //lw/sw
+
+
+}//EXMEM
+
+void MEMWB(stateType *state, stateType *newState) {
+    newState->MEMWB.instr = state->EXMEM.instr;
+    //newState->MEMWB.writeData = state->EXMEM.readReg
+    //IF IT IS A LOAD, WE READ, IF STORE, WE WRITE
+    if(opcode(state->EXMEM.instr) == LW) {
+        newState->MEMWB.writeData = state->dataMem[state->EXMEM.aluResult];
+    } else if(opcode(state->EXMEM.instr) == SW) {
+        newState->dataMem[state->EXMEM.aluResult] = state->EXMEM.readReg;
+    }
+
+
+
+}//MEMWB
+
+void WBEND(stateType *state, stateType *newState) {
+    newState->WBEND.instr = state->MEMWB.instr;
+    newState->WBEND.instr = state->MEMWB.writeData;
+
+
+}//WBEND
+
 
 
 int convertNum(int num) {
