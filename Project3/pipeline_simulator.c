@@ -195,29 +195,36 @@ int main(int argc, char **argv)
                 printf("total of %d branch mispredictions\n", state.mispreds);
                 exit(0);
             }
-            newState = state;
-            newState.cycles++;
+            //newState = state;
+            //newState.cycles++;
 /*------------------ IF stage ----------------- */
-
+            newState.IFID.instr = state.instrMem[state.IFID.pcPlus1];
+            newState.IFID.pcPlus1 = state.IFID.pcPlus1 +1;
+            newState.fetched = state.fetched+1;
+            
 
 
 
 /*------------------ ID stage ----------------- */
-
-
+            newState.IDEX.instr = state.IFID.instr;
+            // Set reg A and B
+            newState.IDEX.readRegA = field0(state.IFID.instr);
+            newState.IDEX.readRegB = field1(state.IFID.instr);// Set sign extended offsetoffset = signExtend(field2(instr));
+            newState.IDEX.offset = field2(state.IFID.instr); 
 
 /*------------------ EX stage ----------------- */
-
+            newState.EXMEM.instr = state.IDEX.instr;
 
 
 
 /*------------------ MEM stage ----------------- */
-
+            newState.MEMWB.instr = state.EXMEM.instr;
 
 
 
 /*------------------ WB stage ----------------- */
-
+            newState.WBEND.instr = state.MEMWB.instr;
+            
 
 
         state = newState; /* this is the last statement before the end of the loop.
