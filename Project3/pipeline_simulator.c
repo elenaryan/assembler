@@ -456,7 +456,7 @@ void MEMWB(stateType *state, stateType *newState) {
 void WBEND(stateType *state, stateType *newState) {
     newState->WBEND.instr = state->MEMWB.instr;
     newState->WBEND.instr = state->MEMWB.writeData;
-
+    
 
 }//WBEND
 
