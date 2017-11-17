@@ -169,6 +169,8 @@ int main(int argc, char **argv)
             fscanf(f, "%d", &i);
             while (!feof(f) && j< NUMMEMORY) {
                 state.instrMem[j] = i;
+                printf("state.instrMem[j] = %d\n", i);
+                state.dataMem[j] = i;
                 fscanf(f, "%d", &i);
                 j++;
             }
@@ -185,9 +187,9 @@ int main(int argc, char **argv)
         state.pc = 0;//initialize program counter
         int c = 0;//inst counter
 
-
+        //i = 0;
         while(1) {
-            
+            //i++;
             printState(&state);
             /*checking for halt*/
 
@@ -199,9 +201,9 @@ int main(int argc, char **argv)
                 printf("total of %d branches executed\n", state.branches);
                 printf("total of %d branch mispredictions\n", state.mispreds);
                 exit(0);
+ 
             }
-            //newState = state;
-            //newState.cycles++;
+            newState = state;
 /*------------------ IF stage ----------------- */
             IFID(&state, &newState);
             
@@ -218,16 +220,13 @@ int main(int argc, char **argv)
 
 
 /*------------------ MEM stage ----------------- */
-            //newState.MEMWB.instr = state.EXMEM.instr;
             MEMWB(&state, &newState);
 
 
 /*------------------ WB stage ----------------- */
-            //newState.WBEND.instr = state.MEMWB.instr;
             WBEND(&state, &newState);
-
-
-        state = newState; /* this is the last statement before the end of the loop.
+        
+            state = newState; /* this is the last statement before the end of the loop.
 It marks the end of the cycle and updates the current
 state with the values calculated in this cycle
 – AKA “Clock Tick”. */
@@ -236,7 +235,7 @@ state with the values calculated in this cycle
 
 
 
-        }//end while
+        }//end while 
         
     /**while(stat.pc < stat.numMemory) {
 
@@ -414,6 +413,8 @@ void IFID(stateType *state, stateType *newState) {
     newState->IFID.instr = state->instrMem[state->pc];
     newState->IFID.pcPlus1 = state->IFID.pcPlus1+1;
     newState->fetched = state->fetched+1;
+//printf("state.pc is %d\n", state->pc);
+//printf("state->instrMem[state->pc] %d\n", state->instrMem[state->pc]);
 
 }//IFID
 void IDEX(stateType *state, stateType *newState) {
@@ -422,14 +423,22 @@ void IDEX(stateType *state, stateType *newState) {
     newState->IDEX.readRegB = state->reg[field1(state->IFID.instr)];//what is in this register
     newState->IDEX.offset = signExtend(field2(state->IFID.instr));
     newState->IDEX.pcPlus1 = state->IFID.pcPlus1;
-    
+   
 }//IDEX
 void EXMEM(stateType *state, stateType *newState) {
     newState->EXMEM.instr = state->IDEX.instr;
     newState->EXMEM.branchTarget = state->IDEX.offset+state->IDEX.pcPlus1;
     newState->EXMEM.readReg = state->IDEX.readRegA;//this is the contents of reg b
+
+    //ALL ALU DATA FORWARDING GOES HERE
+    
+
+
+
+
     if (opcode(state->IDEX.instr) == ADD) {
-        newState->EXMEM.aluResult = state->IDEX.readRegA + state->IDEX.readRegB;
+        //if(field0(state->IDEX.instr) == 
+            newState->EXMEM.aluResult = state->IDEX.readRegA + state->IDEX.readRegB;
     } else if (opcode(state->IDEX.instr) == NAND) {
         newState->EXMEM.aluResult = !(state->IDEX.readRegA & state->IDEX.readRegB);
     } else if (opcode(state->IDEX.instr) == SW || opcode(state->IDEX.instr)== LW) {
@@ -447,7 +456,11 @@ void MEMWB(stateType *state, stateType *newState) {
         newState->dataMem[state->EXMEM.aluResult] = state->EXMEM.readReg;
     } else if(opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND) {
         newState->MEMWB.writeData = state->EXMEM.aluResult;
-    }//alu res
+    } else if(opcode(state->EXMEM.instr) == BEQ) {
+        if (field0(state->EXMEM.instr) == field1(state->EXMEM.instr)) {
+            newState->pc = state->EXMEM.branchTarget;
+        }
+    }//alu
 
 }//MEMWB
 

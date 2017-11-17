@@ -21,3 +21,4 @@ count	.fill	6	# Begin counter
 ans	.fill	0	# Place to store answer
 cap	.fill	32768	# End counter value
 inc	.fill	1	# Store 1 so we can increment
+    halt
