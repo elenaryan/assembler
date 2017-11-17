@@ -453,7 +453,11 @@ void MEMWB(stateType *state, stateType *newState) {
 
 void WBEND(stateType *state, stateType *newState) {
     newState->WBEND.instr = state->MEMWB.instr;
-    //newState->WBEND.instr = state->MEMWB.writeData;
+    if (opcode(state->MEMWB.instr) == ADD || opcode(state->MEMWB.instr) == NAND) {
+        newState->reg[state->MEMWB.instr & 7] = state->MEMWB.writeData;
+    } else if (opcode(state->MEMWB.instr) == LW) {
+        newState->reg[field0(state->MEMWB.instr)] = state->MEMWB.writeData;
+    }//write back loads
     //WRITE THE DATA to dest reg for and and nand
     // write the data to regA if load
     
