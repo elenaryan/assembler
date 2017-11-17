@@ -441,21 +441,21 @@ void EXMEM(stateType *state, stateType *newState) {
 
 void MEMWB(stateType *state, stateType *newState) {
     newState->MEMWB.instr = state->EXMEM.instr;
-    //newState->MEMWB.writeData = state->EXMEM.readReg
-    //IF IT IS A LOAD, WE READ, IF STORE, WE WRITE
     if(opcode(state->EXMEM.instr) == LW) {
         newState->MEMWB.writeData = state->dataMem[state->EXMEM.aluResult];
     } else if(opcode(state->EXMEM.instr) == SW) {
         newState->dataMem[state->EXMEM.aluResult] = state->EXMEM.readReg;
-    }
-
-
+    } else if(opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND) {
+        newState->MEMWB.writeData = state->EXMEM.aluResult;
+    }//alu res
 
 }//MEMWB
 
 void WBEND(stateType *state, stateType *newState) {
     newState->WBEND.instr = state->MEMWB.instr;
-    newState->WBEND.instr = state->MEMWB.writeData;
+    //newState->WBEND.instr = state->MEMWB.writeData;
+    //WRITE THE DATA to dest reg for and and nand
+    // write the data to regA if load
     
 
 }//WBEND
