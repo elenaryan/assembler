@@ -3,24 +3,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ******************* WORKING OFF OF THE ORIGINAL SIMULATOR ****************//
-
 /*
  * Elena Ryan and Jenna Olson
  * Computer Architecture
- * Pipelined simulator
+ * Pipelined Simulator
  * Project 3 | 11/20/2017
- *
- * // May need to change this description
  *
  * Takes as input a file of assembled machine code
  * In the form of decimal numbers
  * Parses out opcodes and executes instructions
  *
- * The main method takes the file input and loads
- * to memory.  As it steps through, the program identifies each
- * opcode and executes the instruction by parsing out registers
- * and immediates and updating the registers and memory accordingly
+ * The main loop executes one clock cycle. The body of the loop 
+ * determines the new state of the machine (memory, registers,
+ * pipeline registers) at the end of the cycle. This simulator is
+ * pipelined, meaning that instructions will be carried out in different
+ * stages of the pipeline, and multiple instructions will be overlapped.
  */
 
 
@@ -181,7 +178,7 @@ int main(int argc, char **argv)
         }//end file reading and memory initialization
 
 
-        /***THIS IS WHERE LOOP 2 STARTS***/
+        /*** THIS IS WHERE LOOP 2 STARTS ***/
 
         state.numMemory = j;//actual necessary mem size
         state.pc = 0;//initialize program counter
@@ -204,11 +201,11 @@ int main(int argc, char **argv)
  
             }
             newState = state;
+
+
 /*------------------ IF stage ----------------- */
             IFID(&state, &newState);
             
-
-
 
 /*------------------ ID stage ----------------- */
             IDEX(&state, &newState);
@@ -218,7 +215,6 @@ int main(int argc, char **argv)
             EXMEM(&state, &newState);
 
 
-
 /*------------------ MEM stage ----------------- */
             MEMWB(&state, &newState);
 
@@ -226,13 +222,11 @@ int main(int argc, char **argv)
 /*------------------ WB stage ----------------- */
             WBEND(&state, &newState);
         
+
             state = newState; /* this is the last statement before the end of the loop.
 It marks the end of the cycle and updates the current
 state with the values calculated in this cycle
 – AKA “Clock Tick”. */
-
-
-
 
 
         }//end while 
@@ -267,8 +261,10 @@ state with the values calculated in this cycle
         }//takes .fill into account
         printState(&stat);
     }//end while **/
+    
     print_stats(c);
     return 0;
+
 }//main
 
 /*
@@ -340,22 +336,26 @@ void printState(stateType *statePtr) {
 		printf("\t\treadRegA %d\n", statePtr->IDEX.readRegA);
 		printf("\t\treadRegB %d\n", statePtr->IDEX.readRegB);
 		printf("\t\toffset %d\n", statePtr->IDEX.offset);
-   printf("\tEXMEM:\n");
-        printf("\t\tinstruction ");
-        printInstruction(statePtr->EXMEM.instr);
-        printf("\t\tbranchTarget %d\n", statePtr->EXMEM.branchTarget);
-        printf("\t\taluResult %d\n", statePtr->EXMEM.aluResult);
-        printf("\t\treadRegB %d\n", statePtr->EXMEM.readReg);
-    printf("\tMEMWB:\n");
+   	
+	printf("\tEXMEM:\n");
+        	printf("\t\tinstruction ");
+        	printInstruction(statePtr->EXMEM.instr);
+        	printf("\t\tbranchTarget %d\n", statePtr->EXMEM.branchTarget);
+        	printf("\t\taluResult %d\n", statePtr->EXMEM.aluResult);
+        	printf("\t\treadRegB %d\n", statePtr->EXMEM.readReg);
+    	
+	printf("\tMEMWB:\n");
 		printf("\t\tinstruction ");
 		printInstruction(statePtr->MEMWB.instr);
 		printf("\t\twriteData %d\n", statePtr->MEMWB.writeData);
+	
 	printf("\tWBEND:\n");
 		printf("\t\tinstruction ");
 		printInstruction(statePtr->WBEND.instr);
 		printf("\t\twriteData %d\n", statePtr->WBEND.writeData);
 
         printf("end state\n");
+
 }//printState
 
 
@@ -441,7 +441,6 @@ void EXMEM(stateType *state, stateType *newState) {
     
  
     //ALL ALU DATA FORWARDING GOES HERE - see the book explanation
-    
 
 //ugh this is legit the worst
     if (opcode(state->IDEX.instr) == ADD) {
