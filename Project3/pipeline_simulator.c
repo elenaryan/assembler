@@ -440,7 +440,7 @@ void EXMEM(stateType *state, stateType *newState) {
     int regB = field1(state->IDEX.instr);//helpful for nand and add data forwarding
     
  
-    //ALL ALU DATA FORWARDING GOES HERE 
+    //ALL ALU DATA FORWARDING GOES HERE - see the book explanation
     
 
 //ugh this is legit the worst
