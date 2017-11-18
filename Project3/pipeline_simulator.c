@@ -436,15 +436,20 @@ void EXMEM(stateType *state, stateType *newState) {
     newState->EXMEM.instr = state->IDEX.instr;
     newState->EXMEM.branchTarget = state->IDEX.offset+state->IDEX.pcPlus1;
     newState->EXMEM.readReg = state->IDEX.readRegA;//this is the contents of reg b
-
-    //ALL ALU DATA FORWARDING GOES HERE
+    int regA = field0(state->IDEX.instr);//helpful for nand and add data forwarding
+    int regB = field1(state->IDEX.instr);//helpful for nand and add data forwarding
+    
+ 
+    //ALL ALU DATA FORWARDING GOES HERE 
     
 
-
-
-
+//ugh this is legit the worst
     if (opcode(state->IDEX.instr) == ADD) {
-        //if(field0(state->IDEX.instr) == 
+        
+
+
+
+
             newState->EXMEM.aluResult = state->IDEX.readRegA + state->IDEX.readRegB;
     } else if (opcode(state->IDEX.instr) == NAND) {
         newState->EXMEM.aluResult = !(state->IDEX.readRegA & state->IDEX.readRegB);
@@ -465,7 +470,8 @@ void MEMWB(stateType *state, stateType *newState) {
         newState->MEMWB.writeData = state->EXMEM.aluResult;
     } else if(opcode(state->EXMEM.instr) == BEQ) {
         if (field0(state->EXMEM.instr) == field1(state->EXMEM.instr)) {
-            newState->pc = state->EXMEM.branchTarget;
+            newState->pc = state->EXMEM.branchTarget;//HERE IS THIS THING!!
+            //update pc, probably update pc+1? change stats, load noops
         }
     }//alu
 
