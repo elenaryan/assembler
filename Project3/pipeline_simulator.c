@@ -408,11 +408,18 @@ int opcode(int instruction){
 	return(instruction>>22);
 }
 void IFID(stateType *state, stateType *newState) {
-    //PROGRAM COUNTER COULD BE WEIRD
-    newState->pc = state->IFID.pcPlus1;
+    
     newState->IFID.instr = state->instrMem[state->pc];
+    newState->pc = state->IFID.pcPlus1;
     newState->IFID.pcPlus1 = state->IFID.pcPlus1+1;
     newState->fetched = state->fetched+1;
+    if(state->IFID.instr == LW && ((field0(state->instrMem[state->pc]) == field1(state->IFID.instr)) || (field1(state->instrMem[state->pc]) == field1(state->IFID.instr)))) {
+        newState->IFID.instr = NOOPINSTRUCTION;
+        newState->pc = state->pc;
+        newState->IFID.pcPlus1 = state->IFID.pcPlus1;
+        newState->fetched = state->fetched;
+        printf(" LOAD STALL NOOP SENT THROUGH CYCLE\n");//can remove this later
+    } //LOAD STALL
 //printf("state.pc is %d\n", state->pc);
 //printf("state->instrMem[state->pc] %d\n", state->instrMem[state->pc]);
 
