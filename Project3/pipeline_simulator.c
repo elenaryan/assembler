@@ -166,7 +166,7 @@ int main(int argc, char **argv)
             fscanf(f, "%d", &i);
             while (!feof(f) && j< NUMMEMORY) {
                 state.instrMem[j] = i;
-                printf("state.instrMem[j] = %d\n", i);
+                //printf("state.instrMem[j] = %d\n", i);
                 state.dataMem[j] = i;
                 fscanf(f, "%d", &i);
                 j++;
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
                 printf("machine halted\n");
                 printf("total of %d cycles executed\n", state.cycles);
                 printf("total of %d instructions fetched\n", state.fetched);
-                printf("total of %d instructions retured\n", state.retired);
+                printf("total of %d instructions retired\n", state.retired);
                 printf("total of %d branches executed\n", state.branches);
                 printf("total of %d branch mispredictions\n", state.mispreds);
                 exit(0);
@@ -223,92 +223,16 @@ int main(int argc, char **argv)
             WBEND(&state, &newState);
         
 
-            state = newState; /* this is the last statement before the end of the loop.
-It marks the end of the cycle and updates the current
-state with the values calculated in this cycle
-– AKA “Clock Tick”. */
-
-
+            state = newState; 
         }//end while 
         
-    /**while(stat.pc < stat.numMemory) {
-
-       if(stat.mem[stat.pc] > 32767) {
-          int op = stat.mem[stat.pc]>>22;
-          c++;
-          if(op == 0) {
-             add(stat.mem[stat.pc], &stat);
-             stat.pc++;
-          } else if(op == 1) {
-             nand(stat.mem[stat.pc], &stat);
-             stat.pc++;//nand
-          } else if(op == 2) {
-             lw(stat.mem[stat.pc], &stat);
-             stat.pc++;//lw
-          } else if(op == 3) {
-             sw(stat.mem[stat.pc], &stat);
-             stat.pc++;//sw
-          } else if(op == 4) {
-             beq(stat.mem[stat.pc], &stat);
-          } else if(op == 6) {
-             printf("Halt\n");
-             stat.pc++;
-          } else if(op == 7) {
-             stat.pc++;
-          }
-        } else {
-            stat.pc++;
-        }//takes .fill into account
-        printState(&stat);
-    }//end while **/
-    
+       
     print_stats(c);
     return 0;
 
 }//main
 
-/*
-void add(int inst, stateType *statePtr) {
-    int dest = (inst & 7);
-    int regA = (inst >> 19) & 7;
-    int regB = (inst >> 16) & 7;
-    statePtr->reg[dest] = statePtr->reg[regA] +statePtr->reg[regB];
-}//add
 
-void nand(int inst, stateType *statePtr) {
-    int dest = (inst & 7);
-    int regA = (inst >> 19) & 7;
-    int regB = (inst >> 16) & 7;
-    statePtr->reg[dest] = ~(statePtr->reg[regA] & statePtr->reg[regB]);
-}//nand
-
-void lw(int inst, stateType *statePtr) {
-    int regA = (inst >> 19) & 7;
-    int regB = (inst >> 16) & 7;
-    int immed = convertNum(inst & 0xFFFF);
-    statePtr->reg[regA] = statePtr->mem[statePtr->reg[regB] + immed];
-}//lw
-
-void sw(int inst, stateType *statePtr) {
-    int regA = (inst >> 19) & 7;
-    int regB = (inst >> 16) & 7;
-    int immed = convertNum(inst & 0xFFFF);
-    statePtr->mem[statePtr->reg[regB] + immed] = statePtr->reg[regA];
-}//sw
-
-
-void beq(int inst, stateType *statePtr) {
-    int regA = (inst >> 19) & 7;
-    int regB = (inst >> 16) & 7;
-    int immed = convertNum(inst & 0xFFFF);
-    if(statePtr->reg[regA] == statePtr->reg[regB]) {
-        statePtr->pc = statePtr->pc + 1 + immed;
-    } else {
-        statePtr->pc = statePtr->pc +1;
-    }
-}//beq
-
-*/
 void printState(stateType *statePtr) {
         int i;
         printf("\n@@@\nstate before cycle %d starts\n", statePtr->cycles);
@@ -420,41 +344,88 @@ void IFID(stateType *state, stateType *newState) {
         newState->fetched = state->fetched;
         printf(" LOAD STALL NOOP SENT THROUGH CYCLE\n");//can remove this later
     } //LOAD STALL
-//printf("state.pc is %d\n", state->pc);
-//printf("state->instrMem[state->pc] %d\n", state->instrMem[state->pc]);
-
 }//IFID
 void IDEX(stateType *state, stateType *newState) {
     newState->IDEX.instr = state->IFID.instr;
     newState->IDEX.readRegA = state->reg[field0(state->IFID.instr)];//actually you have to find what is here
     newState->IDEX.readRegB = state->reg[field1(state->IFID.instr)];//what is in this register
-    newState->IDEX.offset = signExtend(field2(state->IFID.instr));
+    if (state->IFID.instr == BEQ) {    
+        newState->IDEX.offset = signExtend(state->reg[field2(state->IFID.instr)]);//should be offset
+    }
     newState->IDEX.pcPlus1 = state->IFID.pcPlus1;
    
 }//IDEX
 void EXMEM(stateType *state, stateType *newState) {
     newState->EXMEM.instr = state->IDEX.instr;
     newState->EXMEM.branchTarget = state->IDEX.offset+state->IDEX.pcPlus1;
-    newState->EXMEM.readReg = state->IDEX.readRegA;//this is the contents of reg b
+    //newState->EXMEM.readReg = state->IDEX.readRegA;//IF REG A IS LOADED, THIS CHANGES TOO
     int regA = field0(state->IDEX.instr);//helpful for nand and add data forwarding
     int regB = field1(state->IDEX.instr);//helpful for nand and add data forwarding
+    int regAcont = state->IDEX.readRegA;
+    int regBcont = state->IDEX.readRegB;
     
- 
-    //ALL ALU DATA FORWARDING GOES HERE - see the book explanation
+    if (opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND) {
+        if(regA == (state->EXMEM.instr & 7)) {
+            regAcont = state->EXMEM.aluResult;
+        }
+    } else if(opcode(state->MEMWB.instr) == ADD || opcode(state->MEMWB.instr) == NAND) {
+        if (regA == (state->MEMWB.instr & 7)) {
+            regAcont = state->MEMWB.writeData;//might have to check that this corresponds
+        }
+    } else if(opcode(state->MEMWB.instr) == LW) {
+        if (regA == field0(state->MEMWB.instr)) {
+            regAcont = state->MEMWB.writeData;
+        }
+    } else if(opcode(state->WBEND.instr) == ADD || opcode(state->WBEND.instr) == NAND) {
+        if (regA == (state->WBEND.instr & 7)) {
+            regAcont = state->WBEND.writeData;//might have to check that this corresponds
+        }
+    } else if(opcode(state->WBEND.instr) == LW) {
+        if (regA == field0(state->WBEND.instr)) {
+            regAcont = state->WBEND.writeData;
+        }
+    }//make sure regA is not a dest register
 
-//ugh this is legit the worst
+    if (opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND) {
+        if(regB == (state->EXMEM.instr & 7)) {
+            regBcont = state->EXMEM.aluResult;
+        }
+    } else if(opcode(state->MEMWB.instr) == ADD || opcode(state->MEMWB.instr) == NAND) {
+        if (regB == (state->MEMWB.instr & 7)) {
+            regBcont = state->MEMWB.writeData;//might have to check that this corresponds
+        }
+    } else if(opcode(state->MEMWB.instr) == LW) {
+        if (regB == field0(state->MEMWB.instr)) {
+            regBcont = state->MEMWB.writeData;
+        }
+    } else if(opcode(state->WBEND.instr) == ADD || opcode(state->WBEND.instr) == NAND) {
+        if (regB == (state->WBEND.instr & 7)) {
+            regBcont = state->WBEND.writeData;//might have to check that this corresponds
+        }
+    } else if(opcode(state->WBEND.instr) == LW) {
+        if (regB == field0(state->WBEND.instr)) {
+            regBcont = state->WBEND.writeData;
+        }
+    }//make sure regB is not a dest register
+
+    
+    newState->EXMEM.readReg = regAcont;//make sure sw is set up for success
+
+
+    //actual ALU ops
     if (opcode(state->IDEX.instr) == ADD) {
-        
-
-
-
-
-            newState->EXMEM.aluResult = state->IDEX.readRegA + state->IDEX.readRegB;
+        newState->EXMEM.aluResult = regAcont + regBcont;
     } else if (opcode(state->IDEX.instr) == NAND) {
-        newState->EXMEM.aluResult = !(state->IDEX.readRegA & state->IDEX.readRegB);
+        newState->EXMEM.aluResult = !(regAcont & regBcont);
     } else if (opcode(state->IDEX.instr) == SW || opcode(state->IDEX.instr)== LW) {
-        newState->EXMEM.aluResult = state->IDEX.readRegB + state->IDEX.offset;
-    } //lw/sw
+        newState->EXMEM.aluResult = regBcont + state->IDEX.offset;
+    } else if(opcode(state->IDEX.instr) == BEQ) {
+        if(regAcont == regBcont) {
+            newState->EXMEM.aluResult = 1;
+        } else {
+            newState->EXMEM.aluResult = 0;
+        }
+    }//lw/sw/beq
 
 
 }//EXMEM
@@ -467,17 +438,15 @@ void MEMWB(stateType *state, stateType *newState) {
         newState->dataMem[state->EXMEM.aluResult] = state->EXMEM.readReg;
     } else if(opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND) {
         newState->MEMWB.writeData = state->EXMEM.aluResult;
-    } else if(opcode(state->EXMEM.instr) == BEQ) {
-        if (field0(state->EXMEM.instr) == field1(state->EXMEM.instr)) {
+    } else if(opcode(state->EXMEM.instr) == BEQ && state->EXMEM.aluResult == 1) {
             newState->pc = state->EXMEM.branchTarget;//BEQ
             newState->EXMEM.instr = NOOPINSTRUCTION;
             newState->IDEX.instr = NOOPINSTRUCTION;
             newState->IFID.instr = NOOPINSTRUCTION;
-            newState.branches++;
-            newState.mispreds++;
-            newState.fetched = newState.fetched -3;//I don't really know what fetched is measuring
-        }
-    }//alu
+            newState->branches++;
+            newState->mispreds++;
+            newState->fetched = state->fetched-3;//let's not count the accidents        
+    }
 
 }//MEMWB
 
@@ -488,8 +457,9 @@ void WBEND(stateType *state, stateType *newState) {
     } else if (opcode(state->MEMWB.instr) == LW) {
         newState->reg[field0(state->MEMWB.instr)] = state->MEMWB.writeData;
     }//write back loads
-    //WRITE THE DATA to dest reg for and and nand
-    // write the data to regA if load
+    if(state->MEMWB.instr != 0) {
+        newState->retired++;
+    }//inst retired
     
 
 }//WBEND
