@@ -25,8 +25,16 @@ to remove the .o and executable files
 * loadhaz  
 	This checks for load stall capability as well as data forwarding hazards.  This ensures that if both registers inputted to the ALU are being updated by a prior instruction later in the cycle, the correct values will be sent to the ALU.  In this example, the data is forwarded from two different steps to both registers.
 
-* pip1  
-	This uses adds, loads, and beq to demonstrate handling of the branching hazard
+* pip  
+	This uses adds, loads, and beq to demonstrate handling of the branching hazard in the context of a loop
+
+* otherops  
+    This uses stores, loads, and labels to exhibit the use of the store instruction and consistent and correct data forwarding.
+
+* nand
+    This uses the nand, lw, and sw instructions, and exhibits data forwarding
+
+
 
 
 

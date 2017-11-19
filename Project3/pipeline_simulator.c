@@ -187,7 +187,7 @@ int main(int argc, char **argv)
         //i = 0;
         while(1) {
             //i++;
-            //printState(&state);
+            printState(&state);
             /*checking for halt*/
 
             if(HALT == opcode(state.MEMWB.instr)) {
@@ -339,7 +339,7 @@ void IFID(stateType *state, stateType *newState) {
     newState->pc = state->pc+1;
     newState->IFID.pcPlus1 = state->pc+1;
     newState->fetched = state->fetched+1;
-    printf("AT cycle: %d instruction is %d\n", newState->fetched, newState->IFID.instr);
+    //printf("AT cycle: %d instruction is %d\n", newState->fetched, newState->IFID.instr);
     if(opcode(state->IFID.instr) == LW) {
         if(field0(state->instrMem[state->pc]) == field0(state->IFID.instr) || field1(state->instrMem[state->pc]) == field0(state->IFID.instr)) {
             newState->IFID.instr = NOOPINSTRUCTION;
@@ -487,7 +487,7 @@ void MEMWB(stateType *state, stateType *newState) {
     } else if(opcode(state->EXMEM.instr) == BEQ && state->EXMEM.aluResult == 1) {
             newState->pc = state->EXMEM.branchTarget;//BEQ
             //newState->IFID.pcPlus1 = state->EXMEM.branchTarget+1;            
-            printf("newState->pc is %d\n and instrMem[n] is %d\n", newState->pc, state->instrMem[newState->pc]);
+            //printf("newState->pc is %d\n and instrMem[n] is %d\n", newState->pc, state->instrMem[newState->pc]);
             newState->EXMEM.instr = NOOPINSTRUCTION;
             newState->IDEX.instr = NOOPINSTRUCTION;
             newState->IFID.instr = NOOPINSTRUCTION;

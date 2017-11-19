@@ -1,0 +1,9 @@
+lw 1 0 oneh
+lw 2 0 six
+sw 1 0 7
+lw 5 0 six
+nand 3 0 1
+nand 4 1 2
+oneh .fill 127
+six .fill 65
+halt
