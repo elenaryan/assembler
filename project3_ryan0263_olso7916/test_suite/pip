@@ -1,0 +1,15 @@
+	lw	1	0	a	# load reg1 with a
+	lw	2	0	b	# load reg2 with b
+	lw	3	0	count	# load reg3 with count
+	lw	4	0 	cap     # load reg4 with cap
+	lw	7	0	ans	# load reg5 with answer
+	lw	6	0	inc	# load reg6 with inc		
+loop	beq	1	2	end	# if a = b
+	add	1	1	6	# Increment a
+end halt	
+a	.fill	20	
+b	.fill	20
+count	.fill	6	# Begin counter
+ans	.fill	0	# Place to store answer
+cap	.fill	32768	# End counter value
+inc	.fill	15	# Store 1 so we can increment

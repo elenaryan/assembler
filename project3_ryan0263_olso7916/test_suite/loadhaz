@@ -1,0 +1,6 @@
+	lw	1	0	a	# load reg1 with a
+	lw	2	0	b	# load reg2 with b
+	add	3	2	1	# load reg3 with count	
+end halt	
+a	.fill	20	
+b	.fill	20
