@@ -187,7 +187,7 @@ int main(int argc, char **argv)
         //i = 0;
         while(1) {
             //i++;
-            printState(&state);
+            //printState(&state);
             /*checking for halt*/
 
             if(HALT == opcode(state.MEMWB.instr)) {
@@ -200,7 +200,9 @@ int main(int argc, char **argv)
                 exit(0);
  
             }
+            state.cycles++;
             newState = state;
+            
 
 
 /*------------------ IF stage ----------------- */
@@ -337,7 +339,7 @@ void IFID(stateType *state, stateType *newState) {
     newState->pc = state->IFID.pcPlus1;
     newState->IFID.pcPlus1 = state->pc+1;
     newState->fetched = state->fetched+1;
-    if(state->IFID.instr == LW && ((field0(state->instrMem[state->pc]) == field1(state->IFID.instr)) || (field1(state->instrMem[state->pc]) == field1(state->IFID.instr)))) {
+    if(opcode(state->IFID.instr) == LW && ((field0(state->instrMem[state->pc]) == field1(state->IFID.instr)) || (field1(state->instrMem[state->pc]) == field1(state->IFID.instr)))) {
         newState->IFID.instr = NOOPINSTRUCTION;
         newState->pc = state->pc;
         newState->IFID.pcPlus1 = state->IFID.pcPlus1;
