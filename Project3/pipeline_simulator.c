@@ -187,7 +187,7 @@ int main(int argc, char **argv)
         //i = 0;
         while(1) {
             //i++;
-            //printState(&state);
+            printState(&state);
             /*checking for halt*/
 
             if(HALT == opcode(state.MEMWB.instr)) {
@@ -336,15 +336,18 @@ int opcode(int instruction){
 void IFID(stateType *state, stateType *newState) {
     
     newState->IFID.instr = state->instrMem[state->pc];
-    newState->pc = state->IFID.pcPlus1;
-    newState->IFID.pcPlus1 = state->pc+1;
+    newState->pc = state->pc+1;
+    newState->IFID.pcPlus1 = state->IFID.pcPlus1+1;
     newState->fetched = state->fetched+1;
-    if(opcode(state->IFID.instr) == LW && ((field0(state->instrMem[state->pc]) == field1(state->IFID.instr)) || (field1(state->instrMem[state->pc]) == field1(state->IFID.instr)))) {
-        newState->IFID.instr = NOOPINSTRUCTION;
-        newState->pc = state->pc;
-        newState->IFID.pcPlus1 = state->IFID.pcPlus1;
-        newState->fetched = state->fetched;
-        printf(" LOAD STALL NOOP SENT THROUGH CYCLE\n");//can remove this later
+    printf("AT cycle: %d instruction is %d\n", newState->fetched, newState->IFID.instr);
+    if(opcode(state->IFID.instr) == LW) {
+        if(field0(state->instrMem[state->pc]) == field0(state->IFID.instr) || field1(state->instrMem[state->pc]) == field0(state->IFID.instr)) {
+            newState->IFID.instr = NOOPINSTRUCTION;
+            newState->pc = state->pc;
+            newState->IFID.pcPlus1 = state->IFID.pcPlus1;
+            newState->fetched = state->fetched;
+            //printf(" LOAD STALL NOOP SENT THROUGH CYCLE\n");//can remove this later
+        }//interior if
     } //LOAD STALL
 }//IFID
 void IDEX(stateType *state, stateType *newState) {
@@ -364,6 +367,7 @@ void IDEX(stateType *state, stateType *newState) {
    
 }//IDEX
 void EXMEM(stateType *state, stateType *newState) {
+    int t = 1;
     newState->EXMEM.instr = state->IDEX.instr;
     newState->EXMEM.branchTarget = state->IDEX.offset+state->IDEX.pcPlus1;
     //newState->EXMEM.readReg = state->IDEX.readRegA;//IF REG A IS LOADED, THIS CHANGES TOO
@@ -371,48 +375,79 @@ void EXMEM(stateType *state, stateType *newState) {
     int regB = field1(state->IDEX.instr);//helpful for nand and add data forwarding
     int regAcont = state->IDEX.readRegA;
     int regBcont = state->IDEX.readRegB;
+    int takenA = 0;
+    int takenB = 0;
     
-    if (opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND) {
+    if (opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND && !(t==takenA)) {
         if(regA == (state->EXMEM.instr & 7)) {
+            //printf("inside A data forward\n");
             regAcont = state->EXMEM.aluResult;
+            takenA = 1;
         }
-    } else if(opcode(state->MEMWB.instr) == ADD || opcode(state->MEMWB.instr) == NAND) {
+    }
+    if(opcode(state->MEMWB.instr) == ADD || opcode(state->MEMWB.instr) == NAND && !(t==takenA)) {
         if (regA == (state->MEMWB.instr & 7)) {
+            //printf("inside A data forward\n");
             regAcont = state->MEMWB.writeData;//might have to check that this corresponds
+            takenA = 1;
         }
-    } else if(opcode(state->MEMWB.instr) == LW) {
+    }
+    if(opcode(state->MEMWB.instr) == LW && !(t==takenA)) {
         if (regA == field0(state->MEMWB.instr)) {//i think you load it with regB*???
+            printf("inside A data forward for that one LW MEMWB\n");
             regAcont = state->MEMWB.writeData;
+            takenA = 1;
         }
-    } else if(opcode(state->WBEND.instr) == ADD || opcode(state->WBEND.instr) == NAND) {
+    }
+    if(opcode(state->WBEND.instr) == ADD || opcode(state->WBEND.instr) == NAND && !(t==takenA)) {
         if (regA == (state->WBEND.instr & 7)) {
+            //printf("inside A data forward\n");
             regAcont = state->WBEND.writeData;//might have to check that this corresponds
+            takenA = 1;
         }
-    } else if(opcode(state->WBEND.instr) == LW) {
+    }
+    if(opcode(state->WBEND.instr) == LW && !(t==takenA)) {
         if (regA == field0(state->WBEND.instr)) {
+            //printf("inside A data forward\n");
             regAcont = state->WBEND.writeData;
+            takenA = 1;
         }
+        
     }//make sure regA is not a dest register
 
-    if (opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND) {
+    if (opcode(state->EXMEM.instr) == ADD || opcode(state->EXMEM.instr) == NAND && !(t==takenB)) {
         if(regB == (state->EXMEM.instr & 7)) {
+            //printf("inside B data forward\n");
             regBcont = state->EXMEM.aluResult;
+            takenB = 1;
         }
-    } else if(opcode(state->MEMWB.instr) == ADD || opcode(state->MEMWB.instr) == NAND) {
+    }
+    if(opcode(state->MEMWB.instr) == ADD || opcode(state->MEMWB.instr) == NAND && !(t==takenB)) {
         if (regB == (state->MEMWB.instr & 7)) {
+            //printf("inside B data forward\n");
             regBcont = state->MEMWB.writeData;//might have to check that this corresponds
+            takenB = 1;
         }
-    } else if(opcode(state->MEMWB.instr) == LW) {
+    }
+    if(opcode(state->MEMWB.instr) == LW && !(t==takenB)) {
         if (regB == field0(state->MEMWB.instr)) {
+            //printf("inside B data forward\n");
             regBcont = state->MEMWB.writeData;
+            takenB = 1;
         }
-    } else if(opcode(state->WBEND.instr) == ADD || opcode(state->WBEND.instr) == NAND) {
+    }
+    if(opcode(state->WBEND.instr) == ADD || opcode(state->WBEND.instr) == NAND && !(t==takenB)) {
         if (regB == (state->WBEND.instr & 7)) {
+            //printf("inside B data forward\n");
             regBcont = state->WBEND.writeData;//might have to check that this corresponds
+            takenB = 1;
         }
-    } else if(opcode(state->WBEND.instr) == LW) {
+    }
+   if(opcode(state->WBEND.instr) == LW && !(t==takenB)) {
         if (regB == field0(state->WBEND.instr)) {
+            printf("inside CORRECT data forward\n");
             regBcont = state->WBEND.writeData;
+            takenB = 1;
         }
     } 
 
@@ -474,7 +509,7 @@ void WBEND(stateType *state, stateType *newState) {
     if(state->MEMWB.instr != 0) {
         newState->retired++;
     }//inst retired
-    
+    newState->WBEND.writeData = state->MEMWB.writeData;
 
 }//WBEND
 
