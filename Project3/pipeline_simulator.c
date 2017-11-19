@@ -187,7 +187,7 @@ int main(int argc, char **argv)
         //i = 0;
         while(1) {
             //i++;
-            printState(&state);
+            //printState(&state);
             /*checking for halt*/
 
             if(HALT == opcode(state.MEMWB.instr)) {
@@ -337,7 +337,7 @@ void IFID(stateType *state, stateType *newState) {
     
     newState->IFID.instr = state->instrMem[state->pc];
     newState->pc = state->pc+1;
-    newState->IFID.pcPlus1 = state->IFID.pcPlus1+1;
+    newState->IFID.pcPlus1 = state->pc+1;
     newState->fetched = state->fetched+1;
     printf("AT cycle: %d instruction is %d\n", newState->fetched, newState->IFID.instr);
     if(opcode(state->IFID.instr) == LW) {
@@ -387,7 +387,6 @@ void EXMEM(stateType *state, stateType *newState) {
     }
     if(opcode(state->MEMWB.instr) == ADD || opcode(state->MEMWB.instr) == NAND && !(t==takenA)) {
         if (regA == (state->MEMWB.instr & 7)) {
-            //printf("inside A data forward\n");
             regAcont = state->MEMWB.writeData;//might have to check that this corresponds
             takenA = 1;
         }
@@ -487,8 +486,8 @@ void MEMWB(stateType *state, stateType *newState) {
         newState->MEMWB.writeData = state->EXMEM.aluResult;
     } else if(opcode(state->EXMEM.instr) == BEQ && state->EXMEM.aluResult == 1) {
             newState->pc = state->EXMEM.branchTarget;//BEQ
-            //newState->            
-            printf("newState->pc is %d\n and instrMem[that num] is %d\n", newState->pc, state->instrMem[newState->pc]);
+            //newState->IFID.pcPlus1 = state->EXMEM.branchTarget+1;            
+            printf("newState->pc is %d\n and instrMem[n] is %d\n", newState->pc, state->instrMem[newState->pc]);
             newState->EXMEM.instr = NOOPINSTRUCTION;
             newState->IDEX.instr = NOOPINSTRUCTION;
             newState->IFID.instr = NOOPINSTRUCTION;
