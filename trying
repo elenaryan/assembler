@@ -1,0 +1,6 @@
+lw 1 0 eight
+noop
+sw 1 0 2
+noop
+halt
+eight .fill 8
