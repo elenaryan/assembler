@@ -469,8 +469,13 @@ void MEMWB(stateType *state, stateType *newState) {
         newState->MEMWB.writeData = state->EXMEM.aluResult;
     } else if(opcode(state->EXMEM.instr) == BEQ) {
         if (field0(state->EXMEM.instr) == field1(state->EXMEM.instr)) {
-            newState->pc = state->EXMEM.branchTarget;//HERE IS THIS THING!!
-            //update pc, probably update pc+1? change stats, load noops
+            newState->pc = state->EXMEM.branchTarget;//BEQ
+            newState->EXMEM.instr = NOOPINSTRUCTION;
+            newState->IDEX.instr = NOOPINSTRUCTION;
+            newState->IFID.instr = NOOPINSTRUCTION;
+            newState.branches++;
+            newState.mispreds++;
+            newState.fetched = newState.fetched -3;//I don't really know what fetched is measuring
         }
     }//alu
 
