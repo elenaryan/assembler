@@ -335,7 +335,7 @@ void IFID(stateType *state, stateType *newState) {
     
     newState->IFID.instr = state->instrMem[state->pc];
     newState->pc = state->IFID.pcPlus1;
-    newState->IFID.pcPlus1 = state->IFID.pcPlus1+1;
+    newState->IFID.pcPlus1 = state->pc+1;
     newState->fetched = state->fetched+1;
     if(state->IFID.instr == LW && ((field0(state->instrMem[state->pc]) == field1(state->IFID.instr)) || (field1(state->instrMem[state->pc]) == field1(state->IFID.instr)))) {
         newState->IFID.instr = NOOPINSTRUCTION;
@@ -349,9 +349,15 @@ void IDEX(stateType *state, stateType *newState) {
     newState->IDEX.instr = state->IFID.instr;
     newState->IDEX.readRegA = state->reg[field0(state->IFID.instr)];//actually you have to find what is here
     newState->IDEX.readRegB = state->reg[field1(state->IFID.instr)];//what is in this register
-    if (state->IFID.instr == BEQ) {    
-        newState->IDEX.offset = signExtend(state->reg[field2(state->IFID.instr)]);//should be offset
-    }
+    //printf("****\n*****\n****\nIT IS: %d", state->reg[field2(state->IFID.instr)]);
+    if (opcode(state->IFID.instr) == BEQ) {    
+        newState->IDEX.offset = signExtend(field2(state->IFID.instr));//should be offset
+        //printf("FOR INST %d offset is %d\n", state->IFID.instr, signExtend(field2(state->IFID.instr)));
+        //printf("PCPLUS1 is %d\n ", state->IFID.pcPlus1);
+    } else if (opcode(state->IFID.instr) == LW){
+        newState->IDEX.offset = signExtend(field2(state->IFID.instr));//should be offset
+        //printf("****\n*****\n****\nIT IS: %d", state->reg[field2(state->IFID.instr)]);
+    }//lw 
     newState->IDEX.pcPlus1 = state->IFID.pcPlus1;
    
 }//IDEX
@@ -373,7 +379,7 @@ void EXMEM(stateType *state, stateType *newState) {
             regAcont = state->MEMWB.writeData;//might have to check that this corresponds
         }
     } else if(opcode(state->MEMWB.instr) == LW) {
-        if (regA == field0(state->MEMWB.instr)) {
+        if (regA == field0(state->MEMWB.instr)) {//i think you load it with regB*???
             regAcont = state->MEMWB.writeData;
         }
     } else if(opcode(state->WBEND.instr) == ADD || opcode(state->WBEND.instr) == NAND) {
@@ -406,7 +412,10 @@ void EXMEM(stateType *state, stateType *newState) {
         if (regB == field0(state->WBEND.instr)) {
             regBcont = state->WBEND.writeData;
         }
-    }//make sure regB is not a dest register
+    } 
+
+
+    //}//make sure regB is not a dest register
 
     
     newState->EXMEM.readReg = regAcont;//make sure sw is set up for success
@@ -418,7 +427,8 @@ void EXMEM(stateType *state, stateType *newState) {
     } else if (opcode(state->IDEX.instr) == NAND) {
         newState->EXMEM.aluResult = !(regAcont & regBcont);
     } else if (opcode(state->IDEX.instr) == SW || opcode(state->IDEX.instr)== LW) {
-        newState->EXMEM.aluResult = regBcont + state->IDEX.offset;
+        newState->EXMEM.aluResult = regBcont + state->IDEX.offset;//I think something here might be wrong
+        //printf("THINGS ARE NOT WELL %d %d\n", regBcont, state->IDEX.offset);
     } else if(opcode(state->IDEX.instr) == BEQ) {
         if(regAcont == regBcont) {
             newState->EXMEM.aluResult = 1;
@@ -440,6 +450,8 @@ void MEMWB(stateType *state, stateType *newState) {
         newState->MEMWB.writeData = state->EXMEM.aluResult;
     } else if(opcode(state->EXMEM.instr) == BEQ && state->EXMEM.aluResult == 1) {
             newState->pc = state->EXMEM.branchTarget;//BEQ
+            //newState->            
+            printf("newState->pc is %d\n and instrMem[that num] is %d\n", newState->pc, state->instrMem[newState->pc]);
             newState->EXMEM.instr = NOOPINSTRUCTION;
             newState->IDEX.instr = NOOPINSTRUCTION;
             newState->IFID.instr = NOOPINSTRUCTION;
