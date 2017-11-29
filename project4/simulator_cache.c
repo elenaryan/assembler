@@ -7,7 +7,7 @@
  * Elena Ryan and Jenna Olson
  * Computer Architecture
  * Simulator
- * Project Part II | 10/20/2017
+ * Project Part IV | 12/5/2017
  * 
  * Takes as input a file of assembled machine code
  * In the form of decimal numbers
@@ -17,6 +17,9 @@
  * to memory.  As it steps through, the program identifies each
  * opcode and executes the instruction by parsing out registers
  * and immediates and updating the registers and memory accordingly
+
+
+ * updated 11/28 to take specified inputs (e.g. machine file, block size, num sets, associativity
  */
 
 #define NUMREGS 8
@@ -58,29 +61,26 @@ int main(int argc, char **argv)
         stat.reg[i] = 0;
         i++;
     }
-        if(argc == 1) {
-            printf("No input given.\n");
-	        return 0;
-        } else if (argc == 2 ) {
-            FILE *f;
-            f = fopen(argv[1], "r");
-
-            if (f == NULL)   {
-                printf("Invalid file or path.\n");
-                exit(0);
-            }
-            i = 0;
+        
+        char file[255];
+        printf("Enter the machine code program to simulate: ");
+        scanf("%s", file);
+        FILE *f;
+        f = fopen(file, "r");
+        
+        if (f == NULL)   {
+            printf("Invalid file or path.\n");
+            exit(0);
+        }
+        i = 0;
+        fscanf(f, "%d", &i);
+        while (!feof(f) && j< NUMMEMORY) {
+            stat.mem[j] = i;
             fscanf(f, "%d", &i);
-            while (!feof(f) && j< NUMMEMORY) {
-                stat.mem[j] = i;
-                fscanf(f, "%d", &i);
-                j++;            
-            }
-            fclose(f);
-        } else {
-            printf("Too many inputs given");
-    
-        }//end file reading and memory initialization
+            j++;            
+        }
+        fclose(f);
+        
         
 
 
@@ -88,11 +88,11 @@ int main(int argc, char **argv)
         int num_s;   //number of sets in cache
         int c_assoc; //associativity of the cache
         printf("Enter the block size of the cache in words: ");
-        scanf(%d, &b_size);
+        scanf("%d", &b_size);
         printf("Enter the number of sets in the cache: ");
-        scanf(%d, %num_s);
+        scanf("%d", &num_s);
         printf("Enter the associativity of the cache: ");
-        scanf(%d, %c_assoc);
+        scanf("%d", &c_assoc);
 
 
 
