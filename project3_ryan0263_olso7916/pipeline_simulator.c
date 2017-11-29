@@ -82,15 +82,7 @@ typedef struct statestruct{
 	int mispreds; /* Number of branch mispredictions*/
 } stateType;
 
-// Will probably need to take this struct out, replace with the one directly above from the instruction packet
-// Myre uses dataMem instead of mem, we'll need to choose one to use consistently
-/*typedef struct stateStruct {
-       int pc;
-       int mem[NUMMEMORY];
-       int reg[NUMREGS];
-       int numMemory;
-    } stateType;
-*/
+
 void printState(stateType *statePTr);
 
 int convertNum(int num);
@@ -129,14 +121,6 @@ int main(int argc, char **argv)
 
     stateType state;
     stateType newState;
-   /** IFIDType ifid;
-    IDEXType ides;
-    EXMEMType exmem;
-    MEMWBType memwb;
-    WBENDType wbend;
-
-**/
-
     int i = 0;
     int j = 0;
     /***initialize everything to NOOP in here***/

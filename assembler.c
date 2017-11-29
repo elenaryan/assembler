@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 {
 
     StrMap *sm;
-    char buf[255];
+    char buf[300];
     sm = sm_new(10);
     int result;
 
@@ -159,6 +159,7 @@ int main(int argc, char **argv)
             }
 
             if(strcmp(tok, "sw")==0) {
+                //printf("INSW\n");
                 inst = 3 << 22;
 		char buf[6];
                 tok = strtok(NULL, " \t\n");
@@ -169,15 +170,19 @@ int main(int argc, char **argv)
 		inst = (atoi(tok) <<16) | inst;
 		tok = strtok(NULL, " \t\n");
 		if(sm_get(sm, tok, buf, sizeof(buf)) != 0) {
+            //printf("INSIDE label if\n");
 			inst = (atoi(buf) & 0xFFFF)  | inst;
 		}else if(CheckRegisters(tok) == 0) {return 0;}
                 else {
-                        tok = strtok(NULL, " \t\n");
+                    //tok = strtok(NULL, " \t\n");
+                    //printf("before setting inst\n");
                 	inst = atoi(tok) | inst;
+                    //printf("after setting inst\n");
                 }
-		instructions[m] = inst;
+            //printf("trying to access inst[%d] and put in%d\n", m, inst);
+		    instructions[m] = inst;
+            //printf("SW DONE");
             }
-
             if(strcmp(tok, "beq")==0) {
                 inst = 4 << 22;
 		char buf[6];

@@ -1,6 +1,0 @@
-lw 1 0 next
-lw 2 0 here
-sw 1 0 4
-here .fill 8
-next .fill 13
-halt
