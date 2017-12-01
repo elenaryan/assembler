@@ -82,7 +82,7 @@ int main(int argc, char **argv)
         fclose(f);
         
         
-
+        printf("Please enter cache settings\n Note that total # blocks must be <= 256, and that all entries must be powers of 2\n");
 
         int b_size;  //block size
         int num_s;   //number of sets in cache
@@ -93,9 +93,8 @@ int main(int argc, char **argv)
         scanf("%d", &num_s);
         printf("Enter the associativity of the cache: ");
         scanf("%d", &c_assoc);
-
-
-
+        
+        int cache[num_s][c_assoc][b_size+3];//three d array, set x associativity x blocksize+ room for valid/dirty/tag
 
 
         stat.numMemory = j;//actual necessary mem size
