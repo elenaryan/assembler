@@ -49,6 +49,8 @@ void beq(int inst, stateType *statePtr);
 
 void jalr(int inst, stateType *statePtr);
 
+int cacheSim(int *cache, int n_sets, int assoc, int w_block, int act);
+
 void print_stats(int n_instrs);
 
 int main(int argc, char **argv)
@@ -103,24 +105,31 @@ int main(int argc, char **argv)
     while(stat.pc < stat.numMemory) {
         
        if(stat.mem[stat.pc] > 32767) {
-          int op = stat.mem[stat.pc]>>22;
+          //probably need a better way to figure this out, and also store the value in the function cass
+          int curri = stat.mem[stat.pc];
+          int op = curri>>22;
+          int regA = (curri >> 19) & 7;
+          int regB = (curri >> 16) & 7;
+          int immed = convertNum(curri & 0xFFFF);
           c++;
           if(op == 0) {
-             add(stat.mem[stat.pc], &stat);
+             add(curri, &stat);
              stat.pc++;
           } else if(op == 1) {
-             nand(stat.mem[stat.pc], &stat);
+             nand(curri, &stat);
              stat.pc++;//nand
           } else if(op == 2) {
-             lw(stat.mem[stat.pc], &stat);
+             stat.reg[regA] = stat.mem[stat.reg[regB] + immed];
+             //lw(curri, &stat);
              stat.pc++;//lw
           } else if(op == 3) {
-             sw(stat.mem[stat.pc], &stat);
+             stat.mem[stat.reg[regB] + immed] = stat.reg[regA];
+             //sw(curri, &stat);
              stat.pc++;//sw
           } else if(op == 4) {
-             beq(stat.mem[stat.pc], &stat);
+             beq(curri, &stat);
           } else if(op == 5) {
-             jalr(stat.mem[stat.pc], &stat);                
+             jalr(curri, &stat);                
           } else if(op == 6) {
              printf("Halt\n");
              stat.pc++;
@@ -200,7 +209,22 @@ void printState(stateType *statePtr) {
         }
         printf("end state\n");
 }//printState
+int cacheSim(int *cache, int n_sets, int assoc, int w_block, int act) {
+//this should be the only place that memory is ever reffed
 
+
+
+
+
+
+
+
+
+
+
+
+
+}//send in the cache, number of sets, associativity, block size, and action to take
 
 
 int convertNum(int num) {
