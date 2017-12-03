@@ -108,7 +108,24 @@ int main(int argc, char **argv)
 
        if(stat.mem[stat.pc] > 32767) {
           //probably need a better way to figure this out, and also store the value in the function cass
+
+
+
+          
           int curri = stat.mem[stat.pc];
+/* ----- Implementing Cache Instruction Fetch ------ */
+
+          int addr = stat.pc;
+          int block= stat.pc/b_size;
+          int set  = block % num_s;
+          
+
+
+
+
+
+
+
           int op = curri>>22;
           int regA = (curri >> 19) & 7;
           int regB = (curri >> 16) & 7;
