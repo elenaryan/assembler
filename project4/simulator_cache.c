@@ -131,11 +131,8 @@ int main(int argc, char **argv)
           } else if(op == 4) {
              beq(curri, &stat);
           } else if(op == 5) {
-<<<<<<< HEAD
-             jalr(curri, &stat);                
-=======
-             jalr(stat.mem[stat.pc], &stat);
->>>>>>> b4970af0f113ba7ae16a69fe78c9f767e911cc51
+
+             jalr(curri, &stat);    
           } else if(op == 6) {
              printf("Halt\n");
              stat.pc++;
@@ -166,19 +163,7 @@ void nand(int inst, stateType *statePtr) {
     statePtr->reg[dest] = ~(statePtr->reg[regA] & statePtr->reg[regB]);
 }//nand
 
-void lw(int inst, stateType *statePtr) {
-    int regA = (inst >> 19) & 7;
-    int regB = (inst >> 16) & 7;
-    int immed = convertNum(inst & 0xFFFF);
-    statePtr->reg[regA] = statePtr->mem[statePtr->reg[regB] + immed];
-}//lw
 
-void sw(int inst, stateType *statePtr) {
-    int regA = (inst >> 19) & 7;
-    int regB = (inst >> 16) & 7;
-    int immed = convertNum(inst & 0xFFFF);
-    statePtr->mem[statePtr->reg[regB] + immed] = statePtr->reg[regA];
-}//sw
 
 
 void beq(int inst, stateType *statePtr) {
@@ -230,10 +215,8 @@ int cacheSim(int *cache, int n_sets, int assoc, int w_block, int act) {
 
 
 
-<<<<<<< HEAD
 }//send in the cache, number of sets, associativity, block size, and action to take
 
-=======
 /*
 * Log the specifics of each cache action.
 *
@@ -263,8 +246,6 @@ void printAction(int address, int size, enum actionType type)
 		printf("from the cache to nowhere\n");
 	}
 } // printAction
->>>>>>> b4970af0f113ba7ae16a69fe78c9f767e911cc51
-
 int convertNum(int num) {
         if(num &(1<<15)) {
             num-=(1<<16);
