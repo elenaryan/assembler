@@ -3,12 +3,12 @@
 #include <string.h>
 
 
-/* 
+/*
  * Elena Ryan and Jenna Olson
  * Computer Architecture
  * Simulator
- * Project Part IV | 12/5/2017
- * 
+ * Project IV | 12/6/2017
+ *
  * Takes as input a file of assembled machine code
  * In the form of decimal numbers
  * Parses out opcodes and executes instructions
@@ -25,6 +25,7 @@
 #define NUMREGS 8
 #define NUMMEMORY 65536
 
+enum actionType {cacheToProcessor, processorToCache, memoryToCache, cacheToMemory, cacheToNowhere};
 
 typedef struct stateStruct {
        int pc;
@@ -34,6 +35,8 @@ typedef struct stateStruct {
     } stateType;
 
 void printState(stateType *statePTr);
+
+void printAction(int address, int size, enum actionType type);
 
 int convertNum(int num);
 
@@ -63,13 +66,13 @@ int main(int argc, char **argv)
         stat.reg[i] = 0;
         i++;
     }
-        
+
         char file[255];
         printf("Enter the machine code program to simulate: ");
         scanf("%s", file);
         FILE *f;
         f = fopen(file, "r");
-        
+
         if (f == NULL)   {
             printf("Invalid file or path.\n");
             exit(0);
@@ -79,11 +82,10 @@ int main(int argc, char **argv)
         while (!feof(f) && j< NUMMEMORY) {
             stat.mem[j] = i;
             fscanf(f, "%d", &i);
-            j++;            
+            j++;
         }
         fclose(f);
-        
-        
+
         printf("Please enter cache settings\n Note that total # blocks must be <= 256, and that all entries must be powers of 2\n");
 
         int b_size;  //block size
@@ -95,7 +97,7 @@ int main(int argc, char **argv)
         scanf("%d", &num_s);
         printf("Enter the associativity of the cache: ");
         scanf("%d", &c_assoc);
-        
+
         int cache[num_s][c_assoc][b_size+3];//three d array, set x associativity x blocksize+ room for valid/dirty/tag
 
 
@@ -103,7 +105,7 @@ int main(int argc, char **argv)
         stat.pc = 0;//initialize program counter
         int c = 0;//inst counter
     while(stat.pc < stat.numMemory) {
-        
+
        if(stat.mem[stat.pc] > 32767) {
           //probably need a better way to figure this out, and also store the value in the function cass
           int curri = stat.mem[stat.pc];
@@ -129,13 +131,17 @@ int main(int argc, char **argv)
           } else if(op == 4) {
              beq(curri, &stat);
           } else if(op == 5) {
+<<<<<<< HEAD
              jalr(curri, &stat);                
+=======
+             jalr(stat.mem[stat.pc], &stat);
+>>>>>>> b4970af0f113ba7ae16a69fe78c9f767e911cc51
           } else if(op == 6) {
              printf("Halt\n");
              stat.pc++;
           } else if(op == 7) {
              stat.pc++;
-          }      
+          }
         } else {
             stat.pc++;
         }//takes .fill into account
@@ -224,8 +230,40 @@ int cacheSim(int *cache, int n_sets, int assoc, int w_block, int act) {
 
 
 
+<<<<<<< HEAD
 }//send in the cache, number of sets, associativity, block size, and action to take
 
+=======
+/*
+* Log the specifics of each cache action.
+*
+* address is the starting word address of the range of data being transferred.
+* size is the size of the range of data being transferred.
+* type specifies the source and destination of the data being transferred.
+*
+* cacheToProcessor: reading data from the cache to the processor
+* processorToCache: writing data from the processor to the cache
+* memoryToCache: reading data from the memory to the cache
+* cacheToMemory: evicting cache data by writing it to the memory
+* cacheToNowhere: evicting cache data by throwing it away
+*/
+
+void printAction(int address, int size, enum actionType type)
+{
+	printf("transferring word [%i-%i] ", address, address + size - 1);
+	if (type == cacheToProcessor) {
+		printf("from the cache to the processor\n");
+	} else if (type == processorToCache) {
+		printf("from the processor to the cache\n");
+	} else if (type == memoryToCache) {
+		printf("from the memory to the cache\n");
+	} else if (type == cacheToMemory) {
+		printf("from the cache to the memory\n");
+	} else if (type == cacheToNowhere) {
+		printf("from the cache to nowhere\n");
+	}
+} // printAction
+>>>>>>> b4970af0f113ba7ae16a69fe78c9f767e911cc51
 
 int convertNum(int num) {
         if(num &(1<<15)) {
