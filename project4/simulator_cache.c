@@ -116,7 +116,7 @@ int main(int argc, char **argv)
 /* ----- Implementing Cache Instruction Fetch ------ */
 
           int addr = stat.pc;
-          int block= stat.pc/b_size; //tag of block in which the address is
+          int block= addr/b_size; //tag of block in which the address is
           int set  = block % num_s;
           int val;
           int incache = 0;
@@ -133,24 +133,21 @@ int main(int argc, char **argv)
           if (incache == 0) {
                 for(int i = 0; i<c_assoc; i++) {
                     if(cache[set][i][0] != 1) {
-                        cache[set][i][0] = 1;
-                        cache[set][i][2] = block;
+                        cache[set][i][0] = 1;//sets valid bit
+                        cache[set][i][2] = block;//sets tag
                         for(int j = 0; j<b_size; j++) {
-                            cache[set][i][j+3] = stat.mem[(block*b_size)+j];
+                            cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
                         }
+                        curri = cache[set][i][3+(addr % b_size)]; //set current inst
                         break;
                     }//if
                 }
            }//does not yet account for LRU
             
 
-          }//send appropriate block from memory, update tag valid etc.
+          //}//send appropriate block from memory, update tag valid etc.
           
-          //search through appropriate set through the associativity
-
-
-
-          // if its there use and store, if not, load it into cache
+          /** ----  INSTRUCTION FETCH FROM CACHE ----**/
 
 
 
@@ -169,10 +166,64 @@ int main(int argc, char **argv)
              nand(curri, &stat);
              stat.pc++;//nand
           } else if(op == 2) {
-             stat.reg[regA] = stat.mem[stat.reg[regB] + immed];
+
+/** ------ CACHE ACCESS FOR LW --------**/
+
+
+            addr = regB+immed;
+            block= addr/b_size; //tag of block in which the address is
+            set  = block % num_s;
+            int val;
+            incache = 0;
+
+          for(int i = 0; i<c_assoc; i++) {
+            if(cache[set][i][2] == block) {
+                val = cache[set][i][3+(addr % b_size)];
+                incache = 1;
+                //print cache to processor
+                break;
+            }
+          }//for
+
+          if (incache == 0) {
+                for(int i = 0; i<c_assoc; i++) {
+                    if(cache[set][i][0] != 1) {
+                        cache[set][i][0] = 1;//sets valid bit
+                        cache[set][i][2] = block;//sets tag
+                        for(int j = 0; j<b_size; j++) {
+                            cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
+                        }
+                        val = cache[set][i][3+(addr % b_size)]; //set current inst
+                        break;
+                    }//if
+                }
+           }
+
+
+             stat.reg[regA] = val;
              //lw(curri, &stat);
+
+
+/** ------ END CACHE STUFF -----------**/
+
              stat.pc++;//lw
           } else if(op == 3) {
+
+
+/** ---------  STORE WORD -------- **/
+
+
+
+
+
+
+
+
+
+
+
+/** ------- STORE WORD ------ **/
+
              stat.mem[stat.reg[regB] + immed] = stat.reg[regA];
              //sw(curri, &stat);
              stat.pc++;//sw
