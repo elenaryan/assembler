@@ -116,10 +116,14 @@ int main(int argc, char **argv)
 /* ----- Implementing Cache Instruction Fetch ------ */
 
           int addr = stat.pc;
-          int block= stat.pc/b_size;
+          int block= stat.pc/b_size; //tag of block in which the address is
           int set  = block % num_s;
           
+          //search through appropriate set through the associativity
 
+
+
+          // if its there use and store, if not, load it into cache
 
 
 
