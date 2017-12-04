@@ -131,6 +131,17 @@ int main(int argc, char **argv)
           }//for
 
           if (incache == 0) {
+                for(int i = 0; i<c_assoc; i++) {
+                    if(cache[set][i][0] != 1) {
+                        cache[set][i][0] = 1;
+                        cache[set][i][2] = block;
+                        for(int j = 0; j<b_size; j++) {
+                            cache[set][i][j+3] = stat.mem[(block*b_size)+j];
+                        }
+                        break;
+                    }//if
+                }
+           }//does not yet account for LRU
             
 
           }//send appropriate block from memory, update tag valid etc.
