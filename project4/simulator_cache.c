@@ -118,6 +118,22 @@ int main(int argc, char **argv)
           int addr = stat.pc;
           int block= stat.pc/b_size; //tag of block in which the address is
           int set  = block % num_s;
+          int val;
+          int incache = 0;
+
+          for(int i = 0; i<c_assoc; i++) {
+            if(cache[set][i][2] == block) {
+                curri = cache[set][i][3+(addr % b_size)];
+                incache = 1;
+                //print cache to processor
+                break;
+            }
+          }//for
+
+          if (incache == 0) {
+            
+
+          }//send appropriate block from memory, update tag valid etc.
           
           //search through appropriate set through the associativity
 
@@ -156,6 +172,8 @@ int main(int argc, char **argv)
              jalr(curri, &stat);    
           } else if(op == 6) {
              printf("Halt\n");
+             //clear cache
+             break;
              stat.pc++;
           } else if(op == 7) {
              stat.pc++;
