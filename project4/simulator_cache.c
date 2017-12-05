@@ -22,7 +22,7 @@
  * updated 11/28 to take specified inputs (e.g. machine file, block size, num sets, associativity)
 
 
- * what remains: ALL PRINTS, COMMAND LINE, IMPLEMENT LRU/WB/EVICTIONS for LW & SW, ALL TESTING, WB AT HALT
+ * what remains: COMMAND LINE, ALL TESTING, WB AT HALT
  */
 
 #define NUMREGS 8
@@ -259,7 +259,7 @@ int main(int argc, char **argv)
                             min = lru[set][i];
                             blk = i;
                     }
-                }
+                }//locate LRU block
 
                 int tag = cache[set][blk][2];
                 if(cache[set][blk][1] == 1) {
@@ -312,7 +312,7 @@ int main(int argc, char **argv)
                 cache[set][i][1] = 1; //set dirty bit
                 lru[set][i] = stat.pc;
                 incache = 1;
-                //print cache to processor
+                printAction(addr, 1, processorToCache);
                 break;
             }
           }//for
@@ -326,6 +326,8 @@ int main(int argc, char **argv)
                         for(int j = 0; j<b_size; j++) {
                             cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
                         }
+                        printAction(block*b_size, b_size, memoryToCache);
+                        printAction(addr, 1, processorToCache);
                         cache[set][i][3+(addr % b_size)] = swval; //set new value
                         cache[set][i][2] = 1; //dirty bit
                         pullmem = 0;
@@ -344,13 +346,16 @@ int main(int argc, char **argv)
                     }
                 }
 
-                
+                int tag = cache[set][blk][2];
                 if(cache[set][blk][1] == 1) {
-                    int tag = cache[set][blk][2];
+                    
                     for (int i = 0; i<b_size; i++) {
                        stat.mem[(tag*b_size) +i] = cache[set][blk][i+3];
                     }
-                }//if the block about to be replaced is dirty, write back to memory
+                    printAction(tag*b_size, b_size, cacheToMemory);
+                } else {
+                    printAction(tag*b_size, b_size, cacheToNowhere);
+                }//evict LRU to memory or nowhere
 
                 cache[set][blk][0] = 1;
                 cache[set][blk][2] = block;//current block
@@ -358,7 +363,9 @@ int main(int argc, char **argv)
                 for (int i=0; i<b_size; i++) {
                     cache[set][blk][i+3] = stat.mem[(block*b_size)+i];//block in from mem
                 }
-                //do the necessary store word ish right here                
+                //do the necessary store word ish right here  
+                printAction(block*b_size, b_size, memoryToCache);
+                printAction(addr, 1, cacheToProcessor);              
                 cache[set][i][3+(addr % b_size)] = swval; //set new value
                 cache[set][i][2] = 1; //dirty bit
            }// if the value is not already in the cache and pullmem has not been set to 0;
