@@ -151,7 +151,7 @@ int main(int argc, char **argv)
 		tok = strtok(NULL, " \t\n");
 		if(sm_get(sm, tok, buf, sizeof(buf)) != 0) {
 			inst = (atoi(buf) & 0xFFFF) | inst;
-		} else if(CheckRegisters(tok) == 0) {return 0;}
+		} //else if(CheckRegisters(tok) == 0) {return 0;}
 		else {
 	        	inst = atoi(tok) | inst;
                 }

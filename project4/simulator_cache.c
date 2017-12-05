@@ -395,7 +395,7 @@ int main(int argc, char **argv)
         } else {
             stat.pc++;
         }//takes .fill into account
-        printState(&stat);
+        //printState(&stat);
     }//end while
     print_stats(c);
     return 0;
