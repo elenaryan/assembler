@@ -67,6 +67,8 @@ int main(int argc, char **argv)
         i++;
     }
 
+        //parse command line here
+
         char file[255];
         printf("Enter the machine code program to simulate: ");
         scanf("%s", file);
@@ -99,7 +101,7 @@ int main(int argc, char **argv)
         scanf("%d", &c_assoc);
 
         int cache[num_s][c_assoc][b_size+3];//three d array, set x associativity x blocksize+ room for valid/dirty/tag
-
+        int lru[num_s][c_assoc]; //2d array keeps track of last pc each block was accessed
 
         stat.numMemory = j;//actual necessary mem size
         stat.pc = 0;//initialize program counter
@@ -124,6 +126,7 @@ int main(int argc, char **argv)
           for(int i = 0; i<c_assoc; i++) {
             if(cache[set][i][2] == block) {
                 curri = cache[set][i][3+(addr % b_size)];
+                lru[set][i] = stat.pc;//update lru value for block
                 incache = 1;
                 //print cache to processor
                 break;
@@ -135,6 +138,7 @@ int main(int argc, char **argv)
                     if(cache[set][i][0] != 1) {
                         cache[set][i][0] = 1;//sets valid bit
                         cache[set][i][2] = block;//sets tag
+                        lru[set][i] = stat.pc;
                         for(int j = 0; j<b_size; j++) {
                             cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
                         }
@@ -142,7 +146,7 @@ int main(int argc, char **argv)
                         break;
                     }//if
                 }
-           }//does not yet account for LRU
+           }//THIS ONLY SWITCHES BLOCKS INTO EMPTY BLOCKS, NEED TO IMPLEMENT REPLACEMENT POLICY
             
 
           //}//send appropriate block from memory, update tag valid etc.
@@ -179,6 +183,7 @@ int main(int argc, char **argv)
           for(int i = 0; i<c_assoc; i++) {
             if(cache[set][i][2] == block) {
                 val = cache[set][i][3+(addr % b_size)];
+                lru[set][i] = stat.pc;
                 incache = 1;
                 //print cache to processor
                 break;
@@ -190,6 +195,7 @@ int main(int argc, char **argv)
                     if(cache[set][i][0] != 1) {
                         cache[set][i][0] = 1;//sets valid bit
                         cache[set][i][2] = block;//sets tag
+                        lru[set][i] = stat.pc;
                         for(int j = 0; j<b_size; j++) {
                             cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
                         }
@@ -197,9 +203,9 @@ int main(int argc, char **argv)
                         break;
                     }//if
                 }
-           }
+           }//DOES NOT YET ACCOUNT FOR REPLACEMENT POLICY
 
-
+            
              stat.reg[regA] = val;
              //lw(curri, &stat);
 
@@ -210,19 +216,48 @@ int main(int argc, char **argv)
           } else if(op == 3) {
 
 
-/** ---------  STORE WORD -------- **/
+/** ---------  STORE WORD CACHE ACCESS-------- **/
+
+        
+            addr = regB+immed;
+            block= addr/b_size; //tag of block in which the address is
+            set  = block % num_s;
+            int val = stat.reg[regA];
+            incache = 0;
+
+          for(int i = 0; i<c_assoc; i++) {
+            if(cache[set][i][2] == block) {
+                cache[set][i][3+(addr % b_size)] = stat.reg[regA];
+                cache[set][i][1] = 1; //set dirty bit
+                lru[set][i] = stat.pc;
+                incache = 1;
+                //print cache to processor
+                break;
+            }
+          }//for
+
+          if (incache == 0) {
+                for(int i = 0; i<c_assoc; i++) {
+                    if(cache[set][i][0] != 1) {
+                        cache[set][i][0] = 1;//sets valid bit
+                        cache[set][i][2] = block;//sets tag
+                        lru[set][i] = stat.pc;
+                        for(int j = 0; j<b_size; j++) {
+                            cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
+                        }
+                        cache[set][i][3+(addr % b_size)] = val; //set new value
+                        cache[set][i][2] = 1; //dirty bit
+                        break;
+                    }//if
+                }
+           }//does not yet account for if the set is full
 
 
 
 
 
 
-
-
-
-
-
-/** ------- STORE WORD ------ **/
+/** ------- STORE WORD CACHE ACCESS ------ **/
 
              stat.mem[stat.reg[regB] + immed] = stat.reg[regA];
              //sw(curri, &stat);
@@ -234,7 +269,7 @@ int main(int argc, char **argv)
              jalr(curri, &stat);    
           } else if(op == 6) {
              printf("Halt\n");
-             //clear cache
+             //LOOP THROUGH DIRTY BLOCKS IN CACHE AND WRITE BACK TO MEMORY
              break;
              stat.pc++;
           } else if(op == 7) {
