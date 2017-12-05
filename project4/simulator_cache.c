@@ -132,7 +132,7 @@ int main(int argc, char **argv)
                 curri = cache[set][i][3+(addr % b_size)];
                 lru[set][i] = stat.pc;//update lru value for block
                 incache = 1;
-                //print cache to processor
+                printAction(addr, 1, cacheToProcessor);
                 break;
             }
           }//for
@@ -146,6 +146,8 @@ int main(int argc, char **argv)
                         for(int j = 0; j<b_size; j++) {
                             cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
                         }
+                        printAction(block*b_size, b_size, memoryToCache);
+                        printAction(addr, 1, cacheToProcessor);
                         curri = cache[set][i][3+(addr % b_size)]; //set current inst
                         pullmem = 0;
                         break;
@@ -162,13 +164,17 @@ int main(int argc, char **argv)
                     }
                 }
 
-                //IMPLEMENT WRITE BACK POLICY HERE
+                int tag = cache[set][blk][2];
                 if(cache[set][blk][1] == 1) {
-                    int tag = cache[set][blk][2];
+                    
                     for (int i = 0; i<b_size; i++) {
                        stat.mem[(tag*b_size) +i] = cache[set][blk][i+3];
                     }
-                }//if the block about to be replaced is dirty, write back to memory
+                    printAction(tag*b_size, b_size, cacheToMemory);
+                } else {
+                    printAction(tag*b_size, b_size, cacheToNowhere);
+                    //if the block isn't dirty, throw it out
+                }
 
                 cache[set][blk][0] = 1;
                 cache[set][blk][2] = block;//current block
@@ -176,16 +182,12 @@ int main(int argc, char **argv)
                 for (int i=0; i<b_size; i++) {
                     cache[set][blk][i+3] = stat.mem[(block*b_size)+i];//block in from mem
                 }
+                printAction(block*b_size, b_size, memoryToCache);
+                printAction(addr, 1, cacheToProcessor);
                 curri = cache[set][i][3+(addr % b_size)];//set instruction
 
            }// if the value is not already in the cache and pullmem has not been set to 0;
             
-
-
-
-
-
-
 
 
 
@@ -218,13 +220,14 @@ int main(int argc, char **argv)
             set  = block % num_s;
             int val;
             incache = 0;
+            pullmem = 1;
 
           for(int i = 0; i<c_assoc; i++) {
             if(cache[set][i][2] == block) {
                 val = cache[set][i][3+(addr % b_size)];
                 lru[set][i] = stat.pc;
                 incache = 1;
-                //print cache to processor
+                printAction(addr, 1, cacheToProcessor);
                 break;
             }
           }//for
@@ -239,13 +242,51 @@ int main(int argc, char **argv)
                             cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
                         }
                         val = cache[set][i][3+(addr % b_size)]; //set current inst
+                        printAction(block*b_size, b_size, memoryToCache);
+                        printAction(addr, 1, cacheToProcessor);
+                        pullmem = 0;
                         break;
                     }//if
                 }
-           }//DOES NOT YET ACCOUNT FOR REPLACEMENT POLICY
+           }//If Cache set is full with lru and writeback done below
 
-            
-             stat.reg[regA] = val;
+
+           if (incache == 0 && pullmem == 1) {
+                int min = lru[set][0];//last recently accessed
+                int blk = 0; //last recently used block
+                for (int i = 0; i<c_assoc; i++) {
+                    if (lru[set][i] < min) {
+                            min = lru[set][i];
+                            blk = i;
+                    }
+                }
+
+                int tag = cache[set][blk][2];
+                if(cache[set][blk][1] == 1) {
+                    
+                    for (int i = 0; i<b_size; i++) {
+                       stat.mem[(tag*b_size) +i] = cache[set][blk][i+3];
+                    }
+                    printAction(tag*b_size, b_size, cacheToMemory);
+
+                } else {
+                    printAction(tag*b_size, b_size, cacheToNowhere);
+                }//if block dirty, write back to mem, else, knock it out
+
+                cache[set][blk][0] = 1;
+                cache[set][blk][2] = block;//current block
+                lru[set][blk] = stat.pc; //update lru value
+                for (int i=0; i<b_size; i++) {
+                    cache[set][blk][i+3] = stat.mem[(block*b_size)+i];//block in from mem
+                }
+                printAction(block*b_size, b_size, memoryToCache);
+                printAction(addr, 1, cacheToProcessor);
+                val = cache[set][i][3+(addr % b_size)];//set instruction
+
+           }// if the value is not already in the cache and pullmem has not been set to 0;
+
+
+             stat.reg[regA] = val;//pass value from cache to regA
              //lw(curri, &stat);
 
 
@@ -263,6 +304,7 @@ int main(int argc, char **argv)
             set  = block % num_s;
             int swval = stat.reg[regA];
             incache = 0;
+            pullmem = 1;
 
           for(int i = 0; i<c_assoc; i++) {
             if(cache[set][i][2] == block) {
@@ -286,10 +328,41 @@ int main(int argc, char **argv)
                         }
                         cache[set][i][3+(addr % b_size)] = swval; //set new value
                         cache[set][i][2] = 1; //dirty bit
+                        pullmem = 0;
                         break;
                     }//if
                 }
-           }//does not yet account for if the set is full
+           }
+
+           if (incache == 0 && pullmem == 1) {
+                int min = lru[set][0];//last recently accessed
+                int blk = 0; //last recently used block
+                for (int i = 0; i<c_assoc; i++) {
+                    if (lru[set][i] < min) {
+                            min = lru[set][i];
+                            blk = i;
+                    }
+                }
+
+                
+                if(cache[set][blk][1] == 1) {
+                    int tag = cache[set][blk][2];
+                    for (int i = 0; i<b_size; i++) {
+                       stat.mem[(tag*b_size) +i] = cache[set][blk][i+3];
+                    }
+                }//if the block about to be replaced is dirty, write back to memory
+
+                cache[set][blk][0] = 1;
+                cache[set][blk][2] = block;//current block
+                lru[set][blk] = stat.pc; //update lru value
+                for (int i=0; i<b_size; i++) {
+                    cache[set][blk][i+3] = stat.mem[(block*b_size)+i];//block in from mem
+                }
+                //do the necessary store word ish right here                
+                cache[set][i][3+(addr % b_size)] = swval; //set new value
+                cache[set][i][2] = 1; //dirty bit
+           }// if the value is not already in the cache and pullmem has not been set to 0;
+
 
 
 
@@ -298,7 +371,6 @@ int main(int argc, char **argv)
 /** ------- STORE WORD CACHE ACCESS ------ **/
 
              stat.mem[stat.reg[regB] + immed] = stat.reg[regA];
-             //sw(curri, &stat);
              stat.pc++;//sw
           } else if(op == 4) {
              beq(curri, &stat);
@@ -307,7 +379,7 @@ int main(int argc, char **argv)
              jalr(curri, &stat);    
           } else if(op == 6) {
              printf("Halt\n");
-             //LOOP THROUGH DIRTY BLOCKS IN CACHE AND WRITE BACK TO MEMORY
+             //LOOP THROUGH ALL DIRTY CACHE BLOCKS
              break;
              stat.pc++;
           } else if(op == 7) {
