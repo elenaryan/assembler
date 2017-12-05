@@ -19,7 +19,10 @@
  * and immediates and updating the registers and memory accordingly
 
 
- * updated 11/28 to take specified inputs (e.g. machine file, block size, num sets, associativity
+ * updated 11/28 to take specified inputs (e.g. machine file, block size, num sets, associativity)
+
+
+ * what remains: ALL PRINTS, COMMAND LINE, IMPLEMENT LRU/WB/EVICTIONS for LW & SW, ALL TESTING, WB AT HALT
  */
 
 #define NUMREGS 8
@@ -160,9 +163,12 @@ int main(int argc, char **argv)
                 }
 
                 //IMPLEMENT WRITE BACK POLICY HERE
-
-
-
+                if(cache[set][blk][1] == 1) {
+                    int tag = cache[set][blk][2];
+                    for (int i = 0; i<b_size; i++) {
+                       stat.mem[(tag*b_size) +i] = cache[set][blk][i+3];
+                    }
+                }//if the block about to be replaced is dirty, write back to memory
 
                 cache[set][blk][0] = 1;
                 cache[set][blk][2] = block;//current block
