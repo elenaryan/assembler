@@ -122,6 +122,7 @@ int main(int argc, char **argv)
           int set  = block % num_s;
           int val;
           int incache = 0;
+          int pullmem = 1;
 
           for(int i = 0; i<c_assoc; i++) {
             if(cache[set][i][2] == block) {
@@ -143,13 +144,45 @@ int main(int argc, char **argv)
                             cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
                         }
                         curri = cache[set][i][3+(addr % b_size)]; //set current inst
+                        pullmem = 0;
                         break;
                     }//if
                 }
-           }//THIS ONLY SWITCHES BLOCKS INTO EMPTY BLOCKS, NEED TO IMPLEMENT REPLACEMENT POLICY
+           }
+           if (incache == 0 && pullmem == 1) {
+                int min = lru[set][0];//last recently accessed
+                int blk = 0; //last recently used block
+                for (int i = 0; i<c_assoc; i++) {
+                    if (lru[set][i] < min) {
+                            min = lru[set][i];
+                            blk = i;
+                    }
+                }
+
+                //IMPLEMENT WRITE BACK POLICY HERE
+
+
+
+
+                cache[set][blk][0] = 1;
+                cache[set][blk][2] = block;//current block
+                lru[set][blk] = stat.pc; //update lru value
+                for (int i=0; i<b_size; i++) {
+                    cache[set][blk][i+3] = stat.mem[(block*b_size)+i];//block in from mem
+                }
+                curri = cache[set][i][3+(addr % b_size)];//set instruction
+
+           }// if the value is not already in the cache and pullmem has not been set to 0;
             
 
-          //}//send appropriate block from memory, update tag valid etc.
+
+
+
+
+
+
+
+
           
           /** ----  INSTRUCTION FETCH FROM CACHE ----**/
 
@@ -222,12 +255,12 @@ int main(int argc, char **argv)
             addr = regB+immed;
             block= addr/b_size; //tag of block in which the address is
             set  = block % num_s;
-            int val = stat.reg[regA];
+            int swval = stat.reg[regA];
             incache = 0;
 
           for(int i = 0; i<c_assoc; i++) {
             if(cache[set][i][2] == block) {
-                cache[set][i][3+(addr % b_size)] = stat.reg[regA];
+                cache[set][i][3+(addr % b_size)] = swval;
                 cache[set][i][1] = 1; //set dirty bit
                 lru[set][i] = stat.pc;
                 incache = 1;
@@ -245,13 +278,12 @@ int main(int argc, char **argv)
                         for(int j = 0; j<b_size; j++) {
                             cache[set][i][j+3] = stat.mem[(block*b_size)+j];//pulls block from memory
                         }
-                        cache[set][i][3+(addr % b_size)] = val; //set new value
+                        cache[set][i][3+(addr % b_size)] = swval; //set new value
                         cache[set][i][2] = 1; //dirty bit
                         break;
                     }//if
                 }
            }//does not yet account for if the set is full
-
 
 
 
