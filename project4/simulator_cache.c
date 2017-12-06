@@ -22,7 +22,7 @@
  * updated 11/28 to take specified inputs (e.g. machine file, block size, num sets, associativity)
 
 
- * what remains: COMMAND LINE, ALL TESTING, WB AT HALT
+ * what remains: COMMAND LINE, WB AT HALT, DIRTY BIT EDITING UPON PULLING INTO CACHE
  */
 
 #define NUMREGS 8
