@@ -119,7 +119,6 @@ int main(int argc, char **argv)
           
           int curri = stat.mem[stat.pc];
 /* ----- Implementing Cache Instruction Fetch ------ */
-
           int addr = stat.pc;
           int block= addr/b_size; //tag of block in which the address is
           int set  = block % num_s;
@@ -188,7 +187,7 @@ int main(int argc, char **argv)
 
            }// if the value is not already in the cache and pullmem has not been set to 0;
             
-
+           
 
 
           
@@ -213,7 +212,6 @@ int main(int argc, char **argv)
           } else if(op == 2) {
 
 /** ------ CACHE ACCESS FOR LW --------**/
-
 
             addr = regB+immed;
             block= addr/b_size; //tag of block in which the address is
@@ -249,7 +247,9 @@ int main(int argc, char **argv)
                     }//if
                 }
            }//If Cache set is full with lru and writeback done below
+           
 
+           //printf("OUTSIDE OF PRIOR CACHE ISH AND INCACHE IS %d and PULLME is %d\n", incache, pullmem);
 
            if (incache == 0 && pullmem == 1) {
                 int min = lru[set][0];//last recently accessed
@@ -260,7 +260,7 @@ int main(int argc, char **argv)
                             blk = i;
                     }
                 }//locate LRU block
-
+                //printf("successfully located LRU Block in set %d space %d\n", set, blk);
                 int tag = cache[set][blk][2];
                 if(cache[set][blk][1] == 1) {
                     
@@ -281,15 +281,11 @@ int main(int argc, char **argv)
                 }
                 printAction(block*b_size, b_size, memoryToCache);
                 printAction(addr, 1, cacheToProcessor);
-                val = cache[set][i][3+(addr % b_size)];//set instruction
+                val = cache[set][blk][3+(addr % b_size)];// THROWS SEG FAULT
 
            }// if the value is not already in the cache and pullmem has not been set to 0;
 
-
              stat.reg[regA] = val;//pass value from cache to regA
-             //lw(curri, &stat);
-
-
 /** ------ END CACHE STUFF -----------**/
 
              stat.pc++;//lw
@@ -297,8 +293,6 @@ int main(int argc, char **argv)
 
 
 /** ---------  STORE WORD CACHE ACCESS-------- **/
-
-        
             addr = regB+immed;
             block= addr/b_size; //tag of block in which the address is
             set  = block % num_s;
@@ -370,14 +364,14 @@ int main(int argc, char **argv)
                 cache[set][i][2] = 1; //dirty bit
            }// if the value is not already in the cache and pullmem has not been set to 0;
 
-
+          
 
 
 
 
 /** ------- STORE WORD CACHE ACCESS ------ **/
 
-             stat.mem[stat.reg[regB] + immed] = stat.reg[regA];
+             //stat.mem[stat.reg[regB] + immed] = stat.reg[regA];
              stat.pc++;//sw
           } else if(op == 4) {
              beq(curri, &stat);
