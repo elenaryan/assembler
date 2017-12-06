@@ -22,7 +22,16 @@
  * updated 11/28 to take specified inputs (e.g. machine file, block size, num sets, associativity)
 
 
- * what remains: COMMAND LINE, WB AT HALT
+ * what remains: 
+
+        USER INPUT:  Right now the program is set up to prompt the user for machine code filename, block, set, assoc
+        This should be changed so that it first checks to see if the appropriate values were entered on command line 
+        and if they were not, prompting the user for them.  These should also include error checking to be powers of 2
+
+
+        TEST CASES:  Be sure to test lw, sw, fetch, with different cache sizes, make sure everything holds to the
+        requirements.  Eviction and LRU policies should be tested as well.  Finally, test to make sure any dirty blocks
+        are written back to in HALT.
  */
 
 #define NUMREGS 8

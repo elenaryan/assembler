@@ -14,7 +14,11 @@ The cache is structured by user input determining block size, set number, and as
 
 
 ## Running Instructions
-
+Unzip folder project4\_ryan0263\_olso7916 to access the directory of the same name
+Within the directory run the command:  
+make  
+and then run either: ./simulator (to be prompted for input) or  
+./simulator -f <filename> -bsize <block size in words> -nsets <number of sets> -a <associativity>  
 
 
 
