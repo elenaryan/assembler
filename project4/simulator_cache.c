@@ -263,7 +263,7 @@ int main(int argc, char **argv)
                             blk = i;
                     }
                 }//locate LRU block
-                //printf("successfully located LRU Block in set %d space %d\n", set, blk);
+                
                 int tag = cache[set][blk][2];
                 if(cache[set][blk][1] == 1) {
                     
@@ -386,6 +386,24 @@ int main(int argc, char **argv)
              jalr(curri, &stat);    
           } else if(op == 6) {
              printf("Halt\n");
+             int wbtag;
+               for (int i = 0; i<num_s; i++) {
+                    for (int j = 0; j<c_assoc; j++) {
+                        if(cache[i][j][1] == 1){
+                            //if dirty, write back to mem
+                            printAction(wbtag*b_size, b_size, cacheToMemory);
+                            printf("WB IN HALT\n");
+                            wbtag = cache[i][j][2];
+                            for(int k = 0; k<b_size; k++) {
+                                stat.mem[(wbtag*b_size) +k] = cache[i][j][k+3];
+                            }//write back in HALT
+
+                        }//if
+                    }//interior for
+            }//exterior for
+
+
+
              //LOOP THROUGH ALL DIRTY CACHE BLOCKS
              break;
              stat.pc++;
