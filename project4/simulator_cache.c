@@ -22,7 +22,7 @@
  * updated 11/28 to take specified inputs (e.g. machine file, block size, num sets, associativity)
 
 
- * what remains: COMMAND LINE, WB AT HALT, DIRTY BIT EDITING UPON PULLING INTO CACHE
+ * what remains: COMMAND LINE, WB AT HALT
  */
 
 #define NUMREGS 8
@@ -140,6 +140,7 @@ int main(int argc, char **argv)
                 for(int i = 0; i<c_assoc; i++) {
                     if(cache[set][i][0] != 1) {
                         cache[set][i][0] = 1;//sets valid bit
+                        cache[set][i][1] = 0; //dirty bit
                         cache[set][i][2] = block;//sets tag
                         lru[set][i] = stat.pc;
                         for(int j = 0; j<b_size; j++) {
@@ -176,6 +177,7 @@ int main(int argc, char **argv)
                 }
 
                 cache[set][blk][0] = 1;
+                cache[set][blk][1] = 0; //dirty bit
                 cache[set][blk][2] = block;//current block
                 lru[set][blk] = stat.pc; //update lru value
                 for (int i=0; i<b_size; i++) {
@@ -234,6 +236,7 @@ int main(int argc, char **argv)
                 for(int i = 0; i<c_assoc; i++) {
                     if(cache[set][i][0] != 1) {
                         cache[set][i][0] = 1;//sets valid bit
+                        cache[set][i][1] = 0; //set dirty bit
                         cache[set][i][2] = block;//sets tag
                         lru[set][i] = stat.pc;
                         for(int j = 0; j<b_size; j++) {
@@ -274,6 +277,7 @@ int main(int argc, char **argv)
                 }//if block dirty, write back to mem, else, knock it out
 
                 cache[set][blk][0] = 1;
+                cache[set][blk][1] = 0; //set dirty bit
                 cache[set][blk][2] = block;//current block
                 lru[set][blk] = stat.pc; //update lru value
                 for (int i=0; i<b_size; i++) {
@@ -315,6 +319,7 @@ int main(int argc, char **argv)
                 for(int i = 0; i<c_assoc; i++) {
                     if(cache[set][i][0] != 1) {
                         cache[set][i][0] = 1;//sets valid bit
+                        cache[set][i][1] = 0; //initialized dirty bit
                         cache[set][i][2] = block;//sets tag
                         lru[set][i] = stat.pc;
                         for(int j = 0; j<b_size; j++) {
@@ -349,10 +354,11 @@ int main(int argc, char **argv)
                     printAction(tag*b_size, b_size, cacheToMemory);
                 } else {
                     printAction(tag*b_size, b_size, cacheToNowhere);
-                }//evict LRU to memory or nowhere
-
+                }//evict LRU to memory or nowhere                
+                
                 cache[set][blk][0] = 1;
-                cache[set][blk][2] = block;//current block
+                cache[set][blk][1] = 0; //init dirty bit
+                cache[set][blk][2] = block;//current block tag
                 lru[set][blk] = stat.pc; //update lru value
                 for (int i=0; i<b_size; i++) {
                     cache[set][blk][i+3] = stat.mem[(block*b_size)+i];//block in from mem
