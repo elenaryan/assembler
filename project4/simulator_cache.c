@@ -2,33 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /*
  * Elena Ryan and Jenna Olson
  * Computer Architecture
- * Simulator
+ * CPU Cache Simulator
  * Project IV | 12/6/2017
  *
- * Takes as input a file of assembled machine code
- * In the form of decimal numbers
- * Parses out opcodes and executes instructions
+ * Takes as input a file of assembled machine code in the form of decimal numbers
+ * Optional input: Block Size, Number of Sets, and Associativity
+ * If not given, user will be prompted for these values
+ * The instructions and data are accessed, these accesses will be serviced by the cache
+ * Cache will transfer data to/from memory as needed
  *
- * The main method takes the file input and loads
- * to memory.  As it steps through, the program identifies each
- * opcode and executes the instruction by parsing out registers
- * and immediates and updating the registers and memory accordingly
-
-
- * updated 11/28 to take specified inputs (e.g. machine file, block size, num sets, associativity)
-
-
+ * See Overview Document for an in-depth summary.
+ *
  * what remains:
-
-        USER INPUT:  Right now the program is set up to prompt the user for machine code filename, block, set, assoc
-        This should be changed so that it first checks to see if the appropriate values were entered on command line 
-        and if they were not, prompting the user for them.  These should also include error checking to be powers of 2
-
-	// USER INPUT DONE
 
         TEST CASES:  Be sure to test lw, sw, fetch, with different cache sizes, make sure everything holds to the
         requirements.  Eviction and LRU policies should be tested as well.  Finally, test to make sure any dirty blocks
@@ -69,6 +57,8 @@ int cacheSim(int *cache, int n_sets, int assoc, int w_block, int act);
 
 void print_stats(int n_instrs);
 
+int powerOfTwo(int num);
+
 
 int main(int argc, char **argv)
 {
@@ -106,11 +96,11 @@ int main(int argc, char **argv)
 
         printf("Enter the associativity of the cache: ");
         scanf("%d", &c_assoc);
-    } // if no arguments are entered (all or none)
+    } // if no arguments are entered (all or none are required)
 
     else if (argc == 5){
 
-	// grabbing/reading the file
+	// grabbing the file
 	f = fopen(argv[1], "r");
 
         // grabbing b_size
@@ -128,6 +118,13 @@ int main(int argc, char **argv)
         printf("Invalid amount of arguments given, please give all or none");
 	return 0;
     } // if an invalid number of arguments are entered
+
+
+    // Error checking for arguments
+    if(powerOfTwo(b_size) == 0 || b_size > 256 || powerOfTwo(num_s) == 0 || powerOfTwo(c_assoc) == 0) {
+	printf("Block size, number of sets, and associativity must be powers of 2\n");
+	return 0;
+    }
 
     // Reading the file
     if (f == NULL)   {
@@ -501,22 +498,6 @@ void printState(stateType *statePtr) {
         printf("end state\n");
 }//printState
 
-int cacheSim(int *cache, int n_sets, int assoc, int w_block, int act) {
-//this should be the only place that memory is ever reffed
-
-
-
-
-
-
-
-
-
-
-
-
-
-}//send in the cache, number of sets, associativity, block size, and action to take
 
 /*
 * Log the specifics of each cache action.
@@ -558,3 +539,10 @@ void print_stats(int n_instrs) {
     printf("INSTRUCTIONS: %d\n", n_instrs);
 }//print_stats
 
+int powerOfTwo(int num) {
+	while((num % 2) == 0 && num > 1) {
+		num = num / 2;
+	}
+	if (num == 1) return 1;
+	else return 0;
+}//powerOfTwo
