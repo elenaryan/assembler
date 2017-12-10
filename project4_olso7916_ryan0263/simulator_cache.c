@@ -16,11 +16,6 @@
  *
  * See Overview Document for an in-depth summary.
  *
- * what remains:
-
-        TEST CASES:  Be sure to test lw, sw, fetch, with different cache sizes, make sure everything holds to the
-        requirements.  Eviction and LRU policies should be tested as well.  Finally, test to make sure any dirty blocks
-        are written back to in HALT.
  */
 
 #define NUMREGS 8
@@ -33,7 +28,7 @@ typedef struct stateStruct {
        int mem[NUMMEMORY];
        int reg[NUMREGS];
        int numMemory;
-    } stateType;
+} stateType;
 
 void printState(stateType *statePTr);
 
@@ -141,17 +136,15 @@ int main(int argc, char **argv)
     fclose(f);
 
     // Setting up the cache, lru, nunMemory, pc, and inst counter
-    int cache[num_s][c_assoc][b_size+3];//three d array, set x associativity x blocksize+ room for valid/dirty/tag
+    int cache[num_s][c_assoc][b_size+3]; //three d array, set x associativity x blocksize+ room for valid/dirty/tag
     int lru[num_s][c_assoc]; //2d array keeps track of last pc each block was accessed
-    stat.numMemory = j;//actual necessary mem size
-    stat.pc = 0;//initialize program counter
-    int c = 0;//inst counter
+    stat.numMemory = j; //actual necessary mem size
+    stat.pc = 0; //initialize program counter
+    int c = 0; //inst counter
 
     while(stat.pc < stat.numMemory) {
 
        if(stat.mem[stat.pc] > 32767) {
-          //probably need a better way to figure this out, and also store the value in the function cass
-
 
           int curri = stat.mem[stat.pc];
 /* ----- Implementing Cache Instruction Fetch ------ */
@@ -279,9 +272,6 @@ int main(int argc, char **argv)
                 }
            }//If Cache set is full with lru and writeback done below
 
-
-           //printf("OUTSIDE OF PRIOR CACHE ISH AND INCACHE IS %d and PULLME is %d\n", incache, pullmem);
-
            if (incache == 0 && pullmem == 1) {
                 int min = lru[set][0];//last recently accessed
                 int blk = 0; //last recently used block
@@ -315,7 +305,7 @@ int main(int argc, char **argv)
                 printAction(addr, 1, cacheToProcessor);
                 val = cache[set][blk][3+(addr % b_size)];// THROWS SEG FAULT
 
-           }// if the value is not already in the cache and pullmem has not been set to 0;
+           }// if the value is not already in the cache and pullmem has not been set to 0
 
              stat.reg[regA] = val;//pass value from cache to regA
 
