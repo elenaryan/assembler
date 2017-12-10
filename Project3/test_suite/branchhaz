@@ -1,0 +1,13 @@
+	lw	1	0	x	# reg1 = x
+	lw	2	0	y	# reg2 = y
+	lw	5	0	inc	# reg5 = 1		
+loop	beq	1	2	stop	# if x = y, branch to stop (should not branch)
+	add	1	1	5	# x = x + 1
+loop1	beq	1	2	stop	# same as loop (should not branch)
+	add	1	1	5	# x = x + 1
+loop2	beq	1	2	stop	# same as loop (should branch)
+	add	1	1	5	# x = x + 1
+stop	halt
+x	.fill	1	# x begins at 1 
+y	.fill	3	# y = 3
+inc	.fill	1	# store 1 to increment 
