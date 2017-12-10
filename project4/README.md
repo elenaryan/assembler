@@ -24,3 +24,16 @@ and then run either: ./simulator (to be prompted for input) or
 
 ## Test Suite
 
+* givenexample.4.2.1 
+	Tests lw and store word through the example given in the instruction packet
+
+* testWB.4.2.1 
+	Tests the functionality of writing back to memory at halt
+
+* LRUtest.4.2.1 
+	Tests the functionality of the eviction using LRU
+
+* difArgs.8.4.2 
+	Tests a different block size, number of sets, and associativity
+
+
