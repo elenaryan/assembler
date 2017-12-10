@@ -410,9 +410,7 @@ int main(int argc, char **argv)
                for (int i = 0; i<num_s; i++) {
                     for (int j = 0; j<c_assoc; j++) {
                         if(cache[i][j][1] == 1){
-                            //if dirty, write back to mem
                             printAction(wbtag*b_size, b_size, cacheToMemory);
-                            printf("WB IN HALT\n");
                             wbtag = cache[i][j][2];
                             for(int k = 0; k<b_size; k++) {
                                 stat.mem[(wbtag*b_size) +k] = cache[i][j][k+3];
@@ -422,11 +420,9 @@ int main(int argc, char **argv)
                     }//interior for
             }//exterior for
 
-
-
-             //LOOP THROUGH ALL DIRTY CACHE BLOCKS
-             break;
              stat.pc++;
+             break;
+             
           } else if(op == 7) {
              stat.pc++;
           }
